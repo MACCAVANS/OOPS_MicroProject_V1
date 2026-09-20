@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForensiX | Evidence Management</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
+
+body{background:#080b16;color:white;min-height:100vh;}
+
+body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82f6;filter:blur(180px);opacity:.10;top:-150px;right:-100px;z-index:-1;}
+
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:250px;background:rgba(13,17,32,.95);border-right:1px solid rgba(255,255,255,.08);padding:25px 16px;position:fixed;height:100vh;left:0;top:0;}
+.logo{font-size:25px;font-weight:800;letter-spacing:2px;padding:0 12px 30px;}
+.logo span{color:#60a5fa;}
+.menu-title{color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;padding:10px 12px;margin-top:8px;}
+.menu a{display:flex;align-items:center;gap:12px;text-decoration:none;color:#aeb7ca;padding:12px;border-radius:10px;margin:4px 0;transition:.25s;font-size:14px;}
+.menu a:hover,.menu a.active{background:linear-gradient(90deg,rgba(59,130,246,.18),rgba(139,92,246,.12));color:white;}
+.menu a.active{border-left:3px solid #60a5fa;}
+.icon{width:22px;text-align:center;font-size:17px;}
+.logout{position:absolute;bottom:25px;left:16px;right:16px;}
+.logout a{color:#f87171 !important;}
+
+/* MAIN */
+.main{margin-left:250px;width:calc(100% - 250px);padding:35px 40px;}
+
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}
+.header h1{font-size:30px;}
+.header p{color:#7f8aa3;font-size:14px;margin-top:6px;}
+.add-btn{background:linear-gradient(135deg,#3b82f6,#7c3aed);color:white;text-decoration:none;border:none;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 25px rgba(59,130,246,.18);cursor:pointer;}
+.add-btn:hover{opacity:.9;}
+
+/* SEARCH / FILTER CONTROLS */
+.tools{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+.search{flex:1;min-width:200px;background:#111629;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:13px 16px;color:white;outline:none;font-size:14px;}
+.search:focus{border-color:#3b82f6;}
+.filter{background:#111629;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:13px 16px;color:#aeb7ca;outline:none;font-size:14px;cursor:pointer;}
+.filter:focus{border-color:#3b82f6;}
+
+/* TABLE CARD */
+.card{background:rgba(17,22,41,.78);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:rgba(59,130,246,.06);}
+th{text-align:left;padding:16px 20px;font-size:11px;color:#68748b;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.07);}
+td{padding:17px 20px;font-size:13px;color:#c5ccda;border-bottom:1px solid rgba(255,255,255,.05);}
+tbody tr{transition:.2s;}
+tbody tr:hover{background:rgba(59,130,246,.05);}
+.evidence-id{color:#60a5fa;font-weight:700;}
+
+/* STATUS BADGES */
+.status{display:inline-block;padding:5px 10px;border-radius:20px;font-size:10px;font-weight:600;}
+.s-collected{background:rgba(168,85,247,.12);color:#c084fc;}
+.s-examination{background:rgba(234,179,8,.10);color:#fbbf24;}
+.s-examined{background:rgba(74,222,128,.10);color:#4ade80;}
+.s-stored{background:rgba(59,130,246,.10);color:#60a5fa;}
+.s-deleted{background:rgba(239,68,68,.10);color:#f87171;}
+
+/* ACTION BUTTONS */
+.action-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.btn-sm{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:.2s;}
+.btn-view{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25);}
+.btn-view:hover{background:rgba(96,165,250,.22);}
+.btn-edit{background:rgba(251,191,36,.10);color:#fbbf24;border:1px solid rgba(251,191,36,.22);}
+.btn-edit:hover{background:rgba(251,191,36,.20);}
+.btn-del{background:rgba(239,68,68,.10);color:#f87171;border:1px solid rgba(239,68,68,.22);}
+.btn-del:hover{background:rgba(239,68,68,.20);}
+
+/* NO RESULTS */
+.no-results{display:none;text-align:center;padding:45px;color:#68748b;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#0d1220;border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:28px;width:100%;max-width:560px;}
+.modal-box h2{font-size:20px;margin-bottom:20px;}
+.detail-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;font-size:13px;}
+.detail-grid b{color:#68748b;}
+.modal-close{float:right;background:none;border:none;color:#aeb7ca;font-size:24px;cursor:pointer;line-height:1;}
+.modal-close:hover{color:white;}
+
+/* RESPONSIVE */
+@media(max-width:1000px){.tools{flex-direction:column;}}
+@media(max-width:700px){
+  .sidebar{width:70px;padding:20px 8px;}
+  .logo{font-size:14px;padding:10px 5px 25px;}
+  .menu-title,.menu a span:not(.icon){display:none;}
+  .menu a{justify-content:center;}
+  .main{margin-left:70px;width:calc(100% - 70px);padding:20px;}
+  .header{flex-direction:column;align-items:flex-start;gap:15px;}
+  .card{overflow-x:auto;}
+  table{min-width:750px;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">FORENSI<span>X</span></div>
+  <div class="menu-title">Main</div>
+  <nav class="menu">
+    <a href="dashboard.html"><span class="icon">▣</span><span>Dashboard</span></a>
+    <a href="cases.html"><span class="icon">📁</span><span>Cases</span></a>
+    <a href="suspects.html"><span class="icon">👤</span><span>Suspects</span></a>
+    <a href="evidence.html" class="active"><span class="icon">🔬</span><span>Evidence</span></a>
+    <a href="history.html"><span class="icon">🕘</span><span>Evidence History</span></a>
+    <div class="menu-title">Analysis</div>
+    <a href="matching.html"><span class="icon">🎯</span><span>Matching</span></a>
+    <a href="reports.html"><span class="icon">📊</span><span>Reports</span></a>
+  </nav>
+  <div class="menu-title">System</div>
+  <nav class="menu">
+      <a href="settings.html"><span class="icon">⚙</span><span>Settings</span></a>
+  </nav>
+  <div class="logout"><nav class="menu"><a href="index.html"><span class="icon">↪</span><span>Logout</span></a></nav></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="header">
+    <div>
+      <h1>Evidence Management</h1>
+      <p>Manage, track and examine collected evidence.</p>
+    </div>
+    <button class="add-btn" onclick="location.href='add-evidence.html'">+ Add Evidence</button>
+  </div>
+
+  <div class="tools">
+    <input type="text" class="search" id="searchInput" placeholder="🔍  Search by ID, type, case, handler...">
+    <select class="filter" id="caseFilter"><option value="">All Cases</option></select>
+    <select class="filter" id="statusFilter">
+      <option value="">All Status</option>
+      <option value="Collected">Collected</option>
+      <option value="Under Examination">Under Examination</option>
+      <option value="Examined">Examined</option>
+      <option value="Stored">Stored</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Evidence ID</th><th>Type</th><th>Case</th><th>Collected</th><th>Handler</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="evidenceTable"></tbody>
+    </table>
+    <div class="no-results" id="noResults">No evidence records found.</div>
+  </div>
+
+</main>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Evidence Details</h2>
+    <div class="detail-grid" id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let allEvidence = [];
+
+function statusClass(s){
+  return {Collected:'s-collected','Under Examination':'s-examination',Examined:'s-examined',Stored:'s-stored',Deleted:'s-deleted'}[s]||'s-collected';
+}
+function fmtDate(v){if(!v)return'—';let d=new Date(v+'T00:00:00');return isNaN(d)?v:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+async function loadEvidence(){
+  try{
+    const r=await fetch(`${API}/api/evidence`);
+    if(r.ok){allEvidence=await r.json();populateCaseFilter();renderTable();}
+    else console.error('Failed to fetch evidence');
+  }catch(e){console.error('Error:',e);}
+}
+
+function populateCaseFilter(){
+  const sel=document.getElementById('caseFilter');
+  const cur=sel.value;
+  const cases=[...new Set(allEvidence.map(e=>e.caseId).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All Cases</option>'+cases.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if(cases.includes(cur))sel.value=cur;
+}
+
+function renderTable(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const cf=document.getElementById('caseFilter').value;
+  const sf=document.getElementById('statusFilter').value;
+  const rows=allEvidence.filter(e=>{
+    const text=[e.evidenceId,e.type,e.caseId,e.handler,e.status,e.description,e.notes].join(' ').toLowerCase();
+    return(!q||text.includes(q))&&(!cf||e.caseId===cf)&&(!sf||e.status===sf);
+  });
+  const tb=document.getElementById('evidenceTable');
+  tb.innerHTML=rows.map(e=>`
+    <tr>
+      <td class="evidence-id">${esc(e.evidenceId)}</td>
+      <td>${esc(e.type)}</td>
+      <td>${esc(e.caseId)}</td>
+      <td>${esc(fmtDate(e.collectionDate))}</td>
+      <td>${esc(e.handler)}</td>
+      <td><span class="status ${statusClass(e.status)}">${esc(e.status)}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-sm btn-view" onclick="viewEvidence(${e.id})">View</button>
+        <button class="btn-sm btn-edit" onclick="editEvidence(${e.id})">Edit</button>
+        <button class="btn-sm btn-del" onclick="deleteEvidence(${e.id})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+  document.getElementById('noResults').style.display=rows.length?'none':'block';
+}
+
+function viewEvidence(id){
+  const e=allEvidence.find(x=>x.id===id);if(!e)return;
+  document.getElementById('modalContent').innerHTML=`
+    <b>Evidence ID</b><span>${esc(e.evidenceId)}</span>
+    <b>Type</b><span>${esc(e.type)}</span>
+    <b>Case</b><span>${esc(e.caseId)}</span>
+    <b>Collected</b><span>${esc(fmtDate(e.collectionDate))}</span>
+    <b>Handler</b><span>${esc(e.handler)}</span>
+    <b>Status</b><span><span class="status ${statusClass(e.status)}">${esc(e.status)}</span></span>
+    <b>Description</b><span>${esc(e.description||'—')}</span>
+    <b>Notes</b><span>${esc(e.notes||'—')}</span>`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',function(ev){if(ev.target===this)closeModal();});
+
+async function editEvidence(id){
+  const e=allEvidence.find(x=>x.id===id);if(!e)return;
+  const status=await appPrompt('Update status:\nCollected / Under Examination / Examined / Stored',e.status, "Update Status");
+  if(status===null)return;
+  const trimmed=status.trim();
+  if(!['Collected','Under Examination','Examined','Stored'].includes(trimmed)){await appAlert('Invalid status.', 'Error');return;}
+  const handler=await appPrompt('Handler name',e.handler, "Update Handler");
+  if(handler===null)return;
+  try{
+    const r=await fetch(`${API}/api/evidence/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:trimmed,handler:handler.trim()||e.handler})});
+    if(r.ok){await loadEvidence();}else await appAlert('Failed to update.', 'Error');
+  }catch(err){console.error(err);}
+}
+
+async function deleteEvidence(id){
+  const e=allEvidence.find(x=>x.id===id);if(!e)return;
+  if(!await appConfirm(`Delete evidence ${e.evidenceId}? A deletion record will remain in history.`, "Delete Evidence", true))return;
+  try{
+    const r=await fetch(`${API}/api/evidence/${id}`,{method:'DELETE'});
+    if(r.ok){await loadEvidence();}else await appAlert('Failed to delete.', 'Error');
+  }catch(err){console.error(err);}
+}
+
+['searchInput','caseFilter','statusFilter'].forEach(id=>document.getElementById(id).addEventListener('input',renderTable));
+document.getElementById('caseFilter').addEventListener('change',renderTable);
+document.getElementById('statusFilter').addEventListener('change',renderTable);
+
+loadEvidence();
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForensiX | Add New Evidence</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
+
+body{background:#080b16;color:white;min-height:100vh;}
+body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82f6;filter:blur(180px);opacity:.10;top:-150px;right:-100px;z-index:-1;}
+
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:250px;background:rgba(13,17,32,.95);border-right:1px solid rgba(255,255,255,.08);padding:25px 16px;position:fixed;height:100vh;left:0;top:0;}
+.logo{font-size:25px;font-weight:800;letter-spacing:2px;padding:0 12px 30px;}
+.logo span{color:#60a5fa;}
+.menu-title{color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;padding:10px 12px;margin-top:8px;}
+.menu a{display:flex;align-items:center;gap:12px;text-decoration:none;color:#aeb7ca;padding:12px;border-radius:10px;margin:4px 0;transition:.25s;font-size:14px;}
+.menu a:hover,.menu a.active{background:linear-gradient(90deg,rgba(59,130,246,.18),rgba(139,92,246,.12));color:white;}
+.menu a.active{border-left:3px solid #60a5fa;}
+.icon{width:22px;text-align:center;font-size:17px;}
+.logout{position:absolute;bottom:25px;left:16px;right:16px;}
+.logout a{color:#f87171 !important;}
+
+/* MAIN */
+.main{margin-left:250px;width:calc(100% - 250px);padding:35px 40px;}
+
+/* HEADER */
+.header{margin-bottom:28px;}
+.header h1{font-size:30px;}
+.header p{color:#7f8aa3;font-size:14px;margin-top:6px;}
+
+/* FORM CARD */
+.form-card{background:rgba(17,22,41,.78);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:30px;max-width:920px;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:20px;row-gap:22px;}
+.form-group{display:flex;flex-direction:column;}
+.form-group.full{grid-column:1 / -1;}
+
+label{font-size:12px;font-weight:600;color:#68748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px;}
+
+input,select,textarea{
+  width:100%;
+  background:#111629;
+  color:#e2e8f0;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;
+  outline:none;
+  font-size:14px;
+  font-family:"Segoe UI",sans-serif;
+}
+input,select{height:46px;padding:0 15px;}
+textarea{min-height:115px;padding:14px 15px;resize:vertical;}
+input::placeholder,textarea::placeholder{color:#4b5563;}
+input:focus,select:focus,textarea:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.10);}
+select option{background:#111629;}
+
+/* NOTICE */
+.notice{margin-top:24px;padding:15px 18px;border-radius:10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.12);color:#7f8aa3;font-size:12px;line-height:1.6;}
+
+/* ACTIONS */
+.actions{display:flex;justify-content:flex-end;gap:12px;margin-top:26px;}
+.btn{height:44px;padding:0 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:flex;align-items:center;}
+.btn-cancel{background:transparent;border:1px solid rgba(255,255,255,.12);color:#aeb7ca;}
+.btn-cancel:hover{background:rgba(255,255,255,.05);}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#7c3aed);color:white;box-shadow:0 8px 25px rgba(59,130,246,.18);}
+.btn-primary:hover{opacity:.9;}
+
+/* SUCCESS MESSAGE */
+.message{display:none;margin-top:16px;padding:13px 16px;border-radius:9px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18);color:#4ade80;font-size:13px;text-align:center;}
+
+/* RESPONSIVE */
+@media(max-width:900px){.form-grid{grid-template-columns:1fr;}.form-group.full{grid-column:auto;}}
+@media(max-width:700px){
+  .sidebar{width:70px;padding:20px 8px;}
+  .logo{font-size:14px;padding:10px 5px 25px;}
+  .menu-title,.menu a span:not(.icon){display:none;}
+  .menu a{justify-content:center;}
+  .main{margin-left:70px;width:calc(100% - 70px);padding:20px;}
+  .actions{flex-direction:column;}
+  .btn{width:100%;justify-content:center;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">FORENSI<span>X</span></div>
+  <div class="menu-title">Main</div>
+  <nav class="menu">
+    <a href="dashboard.html"><span class="icon">▣</span><span>Dashboard</span></a>
+    <a href="cases.html"><span class="icon">📁</span><span>Cases</span></a>
+    <a href="suspects.html"><span class="icon">👤</span><span>Suspects</span></a>
+    <a href="evidence.html" class="active"><span class="icon">🔬</span><span>Evidence</span></a>
+    <a href="history.html"><span class="icon">🕘</span><span>Evidence History</span></a>
+    <div class="menu-title">Analysis</div>
+    <a href="matching.html"><span class="icon">🎯</span><span>Matching</span></a>
+    <a href="reports.html"><span class="icon">📊</span><span>Reports</span></a>
+  </nav>
+  <div class="menu-title">System</div>
+  <nav class="menu">
+      <a href="settings.html"><span class="icon">⚙</span><span>Settings</span></a>
+  </nav>
+  <div class="logout"><nav class="menu"><a href="index.html"><span class="icon">↪</span><span>Logout</span></a></nav></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="header">
+    <h1>Add New Evidence</h1>
+    <p>Register and record evidence collected during an investigation.</p>
+  </div>
+
+  <div class="form-card">
+    <form id="evidenceForm">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="evidenceId">Evidence ID</label>
+          <input type="text" id="evidenceId" placeholder="Example: E-007" required>
+        </div>
+
+        <div class="form-group">
+          <label for="evidenceType">Evidence Type</label>
+          <select id="evidenceType" required>
+            <option value="">Select evidence type</option>
+            <option value="Fingerprint">Fingerprint</option>
+            <option value="CCTV Footage">CCTV Footage</option>
+            <option value="Photograph">Photograph</option>
+            <option value="Document">Document</option>
+            <option value="Access Log">Access Log</option>
+            <option value="USB Device">USB Device</option>
+            <option value="DNA Sample">DNA Sample</option>
+            <option value="Weapon">Weapon</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="associatedCase">Associated Case</label>
+          <select id="associatedCase" required>
+            <option value="">Select case</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="collectionDate">Collection Date</label>
+          <input type="date" id="collectionDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="evidenceHandler">Evidence Handler</label>
+          <input type="text" id="evidenceHandler" placeholder="Enter handler name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="evidenceStatus">Evidence Status</label>
+          <select id="evidenceStatus" required>
+            <option value="">Select status</option>
+            <option value="Collected">Collected</option>
+            <option value="Under Examination">Under Examination</option>
+            <option value="Examined">Examined</option>
+            <option value="Stored">Stored</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label for="evidenceDescription">Evidence Description</label>
+          <textarea id="evidenceDescription" placeholder="Describe the evidence, where it was found, and other relevant details..." required></textarea>
+        </div>
+
+        <div class="form-group full">
+          <label for="investigationNotes">Investigation Notes</label>
+          <textarea id="investigationNotes" placeholder="Add examination notes or additional observations..."></textarea>
+        </div>
+
+      </div>
+
+      <div class="notice">🔒 Evidence records should be handled carefully. All evidence actions are tracked in the Evidence History module for chain-of-custody auditing.</div>
+
+      <div class="actions">
+        <a href="evidence.html" class="btn btn-cancel">Cancel</a>
+        <button type="submit" class="btn btn-primary">+ Add Evidence</button>
+      </div>
+
+      <div class="message" id="message">✓ Evidence added successfully!</div>
+
+    </form>
+  </div>
+
+</main>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+
+// Populate case dropdown from backend
+async function loadCases(){
+  try{
+    const r=await fetch(`${API}/api/cases`);
+    if(r.ok){
+      const cases=await r.json();
+      const sel=document.getElementById('associatedCase');
+      cases.forEach(c=>{
+        const opt=document.createElement('option');
+        opt.value=c.caseNumber;
+        opt.textContent=`${c.caseNumber} · ${c.caseTitle}`;
+        sel.appendChild(opt);
+      });
+    }
+  }catch(e){console.error('Could not load cases:',e);}
+}
+
+document.getElementById('evidenceForm').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const payload = {
+    evidenceId: document.getElementById('evidenceId').value.trim(),
+    type: document.getElementById('evidenceType').value,
+    caseId: document.getElementById('associatedCase').value,
+    collectionDate: document.getElementById('collectionDate').value || null,
+    handler: document.getElementById('evidenceHandler').value.trim(),
+    status: document.getElementById('evidenceStatus').value,
+    description: document.getElementById('evidenceDescription').value.trim(),
+    notes: document.getElementById('investigationNotes').value.trim()
+  };
+  try{
+    const r=await fetch(`${API}/api/evidence`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(r.ok){
+      const msg=document.getElementById('message');
+      msg.style.display='block';
+      setTimeout(()=>{window.location.href='evidence.html';},900);
+    } else {
+      const err=await r.text();
+      await appAlert('Failed to add evidence: '+(err||r.status), 'Error');
+    }
+  }catch(e){await appAlert('Error: '+e.message, 'Error');}
+});
+
+loadCases();
+</script>
+</body>
+</html>

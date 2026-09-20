@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForensiX | Cases</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",sans-serif;
+}
+
+body{
+    background:#080b16;
+    color:white;
+    min-height:100vh;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    background:#3b82f6;
+    filter:blur(180px);
+    opacity:.10;
+    top:-150px;
+    right:-100px;
+    z-index:-1;
+}
+
+.layout{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:250px;
+    background:rgba(13,17,32,.95);
+    border-right:1px solid rgba(255,255,255,.08);
+    padding:25px 16px;
+    position:fixed;
+    height:100vh;
+    left:0;
+    top:0;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:2px;
+    padding:0 12px 30px;
+}
+
+.logo span{
+    color:#60a5fa;
+}
+
+.menu-title{
+    color:#6b7280;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    padding:10px 12px;
+    margin-top:8px;
+}
+
+.menu a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:#aeb7ca;
+    padding:12px;
+    border-radius:10px;
+    margin:4px 0;
+    transition:.25s;
+    font-size:14px;
+}
+
+.menu a:hover,
+.menu a.active{
+    background:linear-gradient(
+        90deg,
+        rgba(59,130,246,.18),
+        rgba(139,92,246,.12)
+    );
+    color:white;
+}
+
+.menu a.active{
+    border-left:3px solid #60a5fa;
+}
+
+.icon{
+    width:22px;
+    text-align:center;
+    font-size:17px;
+}
+
+.logout{
+    position:absolute;
+    bottom:25px;
+    left:16px;
+    right:16px;
+}
+
+.logout a{
+    color:#f87171 !important;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:250px;
+    width:calc(100% - 250px);
+    padding:35px 40px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.header h1{
+    font-size:30px;
+}
+
+.header p{
+    color:#7f8aa3;
+    font-size:14px;
+    margin-top:6px;
+}
+
+.add-btn{
+    background:linear-gradient(135deg,#3b82f6,#7c3aed);
+    color:white;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+    box-shadow:0 8px 25px rgba(59,130,246,.18);
+}
+
+.add-btn:hover{
+    opacity:.9;
+}
+
+/* SEARCH */
+
+.tools{
+    display:flex;
+    gap:15px;
+    margin-bottom:22px;
+}
+
+.search{
+    flex:1;
+    background:#111629;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:11px;
+    padding:13px 16px;
+    color:white;
+    outline:none;
+}
+
+.search:focus{
+    border-color:#3b82f6;
+}
+
+.filter{
+    background:#111629;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:11px;
+    padding:13px 18px;
+    color:#aeb7ca;
+    outline:none;
+}
+
+/* CASE CARDS */
+
+.case-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+}
+
+.case-card{
+    background:rgba(17,22,41,.78);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+    padding:22px;
+    transition:.3s;
+}
+
+.case-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(96,165,250,.4);
+}
+
+.case-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.case-id{
+    color:#60a5fa;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status{
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:10px;
+}
+
+.active{
+    background:rgba(74,222,128,.1);
+    color:#4ade80;
+}
+
+.examined{
+    background:rgba(251,191,36,.1);
+    color:#fbbf24;
+}
+
+.case-card h2{
+    font-size:17px;
+    margin-bottom:10px;
+}
+
+.case-info{
+    color:#7f8aa3;
+    font-size:12px;
+    line-height:1.8;
+}
+
+.case-info span{
+    color:#c4cada;
+}
+
+.divider{
+    height:1px;
+    background:rgba(255,255,255,.06);
+    margin:17px 0;
+}
+
+.case-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.evidence-count{
+    color:#8d98ae;
+    font-size:11px;
+}
+
+.view-btn{
+    color:#60a5fa;
+    text-decoration:none;
+    font-size:12px;
+}
+
+.view-btn:hover{
+    text-decoration:underline;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+    .case-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:700px){
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:14px;
+        padding:10px 5px 25px;
+    }
+
+    .menu-title,
+    .menu a span:not(.icon){
+        display:none;
+    }
+
+    .menu a{
+        justify-content:center;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+        padding:20px;
+    }
+
+    .header{
+        align-items:flex-start;
+        gap:15px;
+        flex-direction:column;
+    }
+
+    .tools{
+        flex-direction:column;
+    }
+
+    .case-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        FORENSI<span>X</span>
+    </div>
+
+    <div class="menu-title">Main</div>
+
+    <nav class="menu">
+
+        <a href="dashboard.html">
+            <span class="icon">▣</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="cases.html" class="active">
+            <span class="icon">📁</span>
+            <span>Cases</span>
+        </a>
+
+        <a href="suspects.html">
+            <span class="icon">👤</span>
+            <span>Suspects</span>
+        </a>
+
+        <a href="evidence.html">
+            <span class="icon">🔬</span>
+            <span>Evidence</span>
+        </a>
+
+        <a href="history.html">
+            <span class="icon">🕘</span>
+            <span>Evidence History</span>
+        </a>
+
+        <div class="menu-title">Analysis</div>
+
+        <a href="matching.html">
+            <span class="icon">🎯</span>
+            <span>Matching</span>
+        </a>
+
+        <a href="reports.html">
+            <span class="icon">📊</span>
+            <span>Reports</span>
+        </a>
+
+        <div class="menu-title">System</div>
+        <a href="settings.html">
+            <span class="icon">⚙</span>
+            <span>Settings</span>
+        </a>
+
+    </nav>
+
+    <div class="logout">
+        <nav class="menu">
+            <a href="index.html">
+                <span class="icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </nav>
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+    <div class="header">
+
+        <div>
+            <h1>Investigation Cases</h1>
+            <p>Manage and monitor all registered investigation cases.</p>
+        </div>
+
+        <a href="add-case.html" class="add-btn">
+            + Create New Case
+        </a>
+
+    </div>
+
+
+    <!-- SEARCH AND FILTER -->
+
+    <div class="tools">
+
+        <input
+            type="text"
+            class="search"
+            id="searchBox"
+            placeholder="🔍  Search cases by name or case ID..."
+        >
+
+        <select class="filter" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="examined">Examined</option>
+        </select>
+
+    </div>
+
+
+    <!-- CASES -->
+
+    <div class="case-grid" id="caseGrid">
+
+        <div class="case-card" data-status="active">
+
+            <div class="case-top">
+                <span class="case-id">CASE C-001</span>
+                <span class="status active">Active</span>
+            </div>
+
+            <h2>College Laptop Theft</h2>
+
+            <div class="case-info">
+                Location: <span>Computer Lab</span><br>
+                Date: <span>08 September 2026</span><br>
+                Investigator: <span>Investigator</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="case-bottom">
+                <span class="evidence-count">🔬 3 Evidence Items</span>
+                <a href="#" class="view-btn">View Case →</a>
+            </div>
+
+        </div>
+
+
+        <div class="case-card" data-status="active">
+
+            <div class="case-top">
+                <span class="case-id">CASE C-002</span>
+                <span class="status active">Active</span>
+            </div>
+
+            <h2>Missing Device</h2>
+
+            <div class="case-info">
+                Location: <span>Library</span><br>
+                Date: <span>06 September 2026</span><br>
+                Investigator: <span>Investigator</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="case-bottom">
+                <span class="evidence-count">🔬 5 Evidence Items</span>
+                <a href="#" class="view-btn">View Case →</a>
+            </div>
+
+        </div>
+
+
+        <div class="case-card" data-status="examined">
+
+            <div class="case-top">
+                <span class="case-id">CASE C-003</span>
+                <span class="status examined">Examined</span>
+            </div>
+
+            <h2>Property Damage</h2>
+
+            <div class="case-info">
+                Location: <span>Block B</span><br>
+                Date: <span>02 September 2026</span><br>
+                Investigator: <span>Investigator</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="case-bottom">
+                <span class="evidence-count">🔬 4 Evidence Items</span>
+                <a href="#" class="view-btn">View Case →</a>
+            </div>
+
+        </div>
+
+
+        <div class="case-card" data-status="active">
+
+            <div class="case-top">
+                <span class="case-id">CASE C-004</span>
+                <span class="status active">Active</span>
+            </div>
+
+            <h2>Unauthorized Access</h2>
+
+            <div class="case-info">
+                Location: <span>Computer Center</span><br>
+                Date: <span>30 August 2026</span><br>
+                Investigator: <span>Investigator</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="case-bottom">
+                <span class="evidence-count">🔬 6 Evidence Items</span>
+                <a href="#" class="view-btn">View Case →</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+</div>
+
+
+<script>
+
+const searchBox = document.getElementById("searchBox");
+const statusFilter = document.getElementById("statusFilter");
+const caseGrid = document.getElementById("caseGrid");
+let allCases = [];
+
+async function loadCases() {
+    try {
+        const response = await fetch("http://localhost:8080/api/cases");
+        if (response.ok) {
+            allCases = await response.json();
+            renderCases();
+        } else {
+            console.error("Failed to fetch cases");
+        }
+    } catch (error) {
+        console.error("Error loading cases:", error);
+    }
+}
+
+async function deleteCase(id) {
+    if(await appConfirm("Are you sure you want to delete this case?", "Delete Case", true)) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/cases/${id}`, {
+                method: "DELETE"
+            });
+            if (response.ok) {
+                await appAlert("Case deleted successfully.", "Success");
+                loadCases();
+            } else {
+                await appAlert("Failed to delete case.", "Error");
+            }
+        } catch (error) {
+            console.error("Error deleting case:", error);
+        }
+    }
+}
+
+async function viewCase(id) {
+    const c = allCases.find(x => x.id === id);
+    if (!c) return;
+    const msg = `
+        Case Number: ${c.caseNumber}
+        Title: ${c.caseTitle}
+        Location: ${c.location}
+        Date: ${c.incidentDate}
+        Status: ${c.status}
+        Investigator: ${c.investigator || "N/A"}
+        
+        Description:
+        ${c.description || "No description provided."}
+    `;
+    await appAlert(msg, "Case Details");
+}
+
+function renderCases() {
+    const search = searchBox.value.toLowerCase();
+    const status = statusFilter.value.toLowerCase();
+
+    caseGrid.innerHTML = ""; // Clear existing
+
+    const filteredCases = allCases.filter(c => {
+        const text = (c.caseTitle + " " + c.caseNumber + " " + c.location).toLowerCase();
+        const matchesSearch = text.includes(search);
+        const matchesStatus = status === "all" || (c.status && c.status.toLowerCase() === status);
+        return matchesSearch && matchesStatus;
+    });
+
+    filteredCases.forEach(c => {
+        const cardStatus = c.status ? c.status.toLowerCase() : "active";
+        const statusClass = cardStatus === "active" ? "active" : "examined";
+        
+        const card = document.createElement("div");
+        card.className = "case-card";
+        card.dataset.status = cardStatus;
+        card.innerHTML = `
+            <div class="case-top">
+                <span class="case-id">CASE ${c.caseNumber}</span>
+                <span class="status ${statusClass}">${c.status}</span>
+            </div>
+
+            <h2>${c.caseTitle}</h2>
+
+            <div class="case-info">
+                Location: <span>${c.location}</span><br>
+                Date: <span>${c.incidentDate}</span><br>
+                Investigator: <span>${c.investigator || "N/A"}</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="case-bottom">
+                <a href="#" onclick="deleteCase(${c.id}); return false;" style="color:#f87171; text-decoration:none; font-size:12px;">Delete</a>
+                <a href="#" onclick="viewCase(${c.id}); return false;" class="view-btn">View Case →</a>
+            </div>
+        `;
+        caseGrid.appendChild(card);
+    });
+}
+
+searchBox.addEventListener("input", renderCases);
+statusFilter.addEventListener("change", renderCases);
+
+// Load cases on startup
+loadCases();
+
+</script>
+
+</body>
+</html>

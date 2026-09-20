@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add New Suspect | FORENSIX</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#080b17;
+    color:#f5f7ff;
+    min-height:100vh;
+}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:249px;
+    height:100vh;
+    background:#0d1121;
+    border-right:1px solid #20263a;
+    padding:28px 16px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:2px;
+    margin:0 0 43px 12px;
+}
+
+.logo span{
+    color:#4d8dff;
+}
+
+.nav-title{
+    color:#68738e;
+    font-size:11px;
+    letter-spacing:1.5px;
+    margin:0 0 18px 12px;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    height:42px;
+    padding:0 15px;
+    margin-bottom:6px;
+    border-radius:10px;
+    text-decoration:none;
+    color:#9da8c0;
+    font-size:14px;
+}
+
+.nav a:hover{
+    background:rgba(77,141,255,.08);
+    color:#fff;
+}
+
+.nav a.active{
+    background:linear-gradient(
+        90deg,
+        rgba(77,141,255,.22),
+        rgba(111,73,231,.20)
+    );
+    color:#fff;
+    border-left:3px solid #4d9cff;
+}
+
+.icon{
+    width:16px;
+    text-align:center;
+    font-size:15px;
+}
+
+.analysis-title{
+    color:#68738e;
+    font-size:11px;
+    letter-spacing:1.5px;
+    margin:28px 0 18px 12px;
+}
+
+.logout{
+    position:absolute;
+    bottom:35px;
+    left:16px;
+    right:16px;
+}
+
+.logout a{
+    color:#ef6464 !important;
+}
+
+.main{
+    margin-left:249px;
+    padding:43px 44px;
+}
+
+.header{
+    max-width:900px;
+    margin-left:0;
+    margin-bottom:27px;
+}
+
+.header h1{
+    font-size:30px;
+    font-weight:700;
+    margin-bottom:9px;
+    letter-spacing:-.5px;
+}
+
+.header p{
+    color:#71809e;
+    font-size:14px;
+}
+
+.form-container{
+    width:896px;
+    max-width:100%;
+    min-height:850px;
+    background:#111627;
+    border:1px solid #20283d;
+    border-radius:18px;
+    padding:32px 30px 30px;
+}
+
+.form-title{
+    font-size:17px;
+    margin-bottom:25px;
+    color:#f0f3fa;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:21px;
+    row-gap:24px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group.full{
+    grid-column:1 / -1;
+}
+
+label{
+    font-size:13px;
+    color:#91a0bd;
+    margin-bottom:9px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    background:#0d1322;
+    color:#eef1f8;
+    border:1px solid #202b40;
+    border-radius:10px;
+    outline:none;
+    font-size:13px;
+}
+
+input,
+select{
+    height:46px;
+    padding:0 14px;
+}
+
+textarea{
+    min-height:110px;
+    padding:15px 14px;
+    resize:vertical;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#59657e;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#4d8dff;
+    box-shadow:0 0 0 2px rgba(77,141,255,.08);
+}
+
+select option{
+    background:#111627;
+    color:#fff;
+}
+
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:28px;
+    padding-top:21px;
+    border-top:1px solid #20273a;
+}
+
+.btn{
+    height:44px;
+    padding:0 23px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.btn-cancel{
+    background:transparent;
+    border:1px solid #283147;
+    color:#9aa6bf;
+}
+
+.btn-cancel:hover{
+    background:#171d2d;
+}
+
+.btn-primary{
+    border:none;
+    color:#fff;
+    background:linear-gradient(135deg,#438cff,#703ee8);
+    box-shadow:0 7px 20px rgba(74,91,230,.22);
+}
+
+.btn-primary:hover{
+    transform:translateY(-1px);
+}
+
+.message{
+    display:none;
+    margin-top:18px;
+    padding:12px;
+    text-align:center;
+    border-radius:8px;
+    color:#6ee7a5;
+    background:rgba(50,200,130,.08);
+    border:1px solid rgba(50,200,130,.22);
+    font-size:13px;
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        width:210px;
+    }
+
+    .main{
+        margin-left:210px;
+        padding:30px;
+    }
+
+    .form-container{
+        width:100%;
+    }
+}
+
+@media(max-width:700px){
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .logout{
+        position:relative;
+        bottom:auto;
+        left:auto;
+        right:auto;
+        margin-top:20px;
+    }
+
+    .main{
+        margin-left:0;
+        padding:25px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">
+        FORENSI<span>X</span>
+    </div>
+
+    <div class="nav">
+
+        <div class="nav-title">MAIN</div>
+
+        <a href="dashboard.html">
+            <span class="icon">▣</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="cases.html">
+            <span class="icon">📁</span>
+            <span>Cases</span>
+        </a>
+
+        <a href="suspects.html" class="active">
+            <span class="icon">♟</span>
+            <span>Suspects</span>
+        </a>
+
+        <a href="evidence.html">
+            <span class="icon">🔬</span>
+            <span>Evidence</span>
+        </a>
+
+        <a href="history.html">
+            <span class="icon">◷</span>
+            <span>Evidence History</span>
+        </a>
+
+        <div class="analysis-title">ANALYSIS</div>
+
+        <a href="matching.html">
+            <span class="icon">🎯</span>
+            <span>Matching</span>
+        </a>
+
+        <a href="reports.html">
+            <span class="icon">📊</span>
+            <span>Reports</span>
+        </a>
+
+        <div class="menu-title">System</div>
+        <a href="settings.html">
+            <span class="icon">⚙</span>
+            <span>Settings</span>
+        </a>
+
+    </div>
+
+    <div class="logout">
+        <a href="index.html">
+            <span class="icon">↪</span>
+            <span>Logout</span>
+        </a>
+    </div>
+
+</div>
+
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="header">
+
+        <h1>Add New Suspect</h1>
+
+        <p>
+            Register a potential suspect and associate them with an investigation case.
+        </p>
+
+    </div>
+
+
+    <div class="form-container">
+
+        <div class="form-title">
+            Suspect Information
+        </div>
+
+
+        <form id="suspectForm">
+
+            <div class="form-grid">
+
+                <!-- SUSPECT ID -->
+                <div class="form-group">
+
+                    <label for="suspectId">
+                        Suspect ID *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="suspectId"
+                        placeholder="Example: SUS-006"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- FULL NAME -->
+                <div class="form-group">
+
+                    <label for="fullName">
+                        Full Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="fullName"
+                        placeholder="Enter suspect name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ASSOCIATED CASE -->
+                <div class="form-group">
+
+                    <label for="associatedCase">
+                        Associated Case *
+                    </label>
+
+                    <select
+                        id="associatedCase"
+                        required
+                    >
+
+                        <option value="">
+                            Select Case
+                        </option>
+
+                        <option value="C-001">
+                            C-001 · College Laptop Theft
+                        </option>
+
+                        <option value="C-002">
+                            C-002 · Missing Device
+                        </option>
+
+                        <option value="C-003">
+                            C-003 · Property Damage
+                        </option>
+
+                        <option value="C-004">
+                            C-004 · Unauthorized Access
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <div class="form-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Known location"
+                    >
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="form-group">
+
+                    <label for="status">
+                        Status
+                    </label>
+
+                    <select id="status">
+
+                        <option value="Under Investigation">
+                            Under Investigation
+                        </option>
+
+                        <option value="Potential Match">
+                            Potential Match
+                        </option>
+
+                        <option value="Cleared">
+                            Cleared
+                        </option>
+
+                        <option value="Under Review">
+                            Under Review
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- CONTACT -->
+                <div class="form-group">
+
+                    <label for="contactInfo">
+                        Contact Information
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contactInfo"
+                        placeholder="Phone or email"
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+                <div class="form-group full">
+
+                    <label for="notes">
+                        Investigation Notes
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        placeholder="Enter relevant observations or investigation notes..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="actions">
+
+                <a
+                    href="suspects.html"
+                    class="btn btn-cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Add Suspect
+                </button>
+
+            </div>
+
+
+            <div
+                class="message"
+                id="message"
+            >
+                ✓ Suspect added successfully!
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document
+    .getElementById("suspectForm")
+    .addEventListener("submit", async function(event){
+
+        event.preventDefault();
+
+        const newSuspect = {
+            suspectId: document.getElementById("suspectId").value,
+            fullName: document.getElementById("fullName").value,
+            associatedCase: document.getElementById("associatedCase").value,
+            location: document.getElementById("location").value,
+            status: document.getElementById("status").value,
+            contactInfo: document.getElementById("contactInfo").value,
+            notes: document.getElementById("notes").value
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/suspects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newSuspect)
+            });
+
+            if (response.ok) {
+                document
+                    .getElementById("message")
+                    .style.display = "block";
+
+                setTimeout(function(){
+                    window.location.href = "suspects.html";
+                }, 1200);
+            } else {
+                await appAlert("Failed to create suspect.", "Error");
+            }
+        } catch (error) {
+            console.error("Error creating suspect:", error);
+            await appAlert("An error occurred while creating the suspect.", "Error");
+        }
+    });
+
+</script>
+
+</body>
+</html>

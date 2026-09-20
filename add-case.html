@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create New Case | FORENSIX</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#080b17;
+    color:#f5f7ff;
+    min-height:100vh;
+}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:282px;
+    height:100vh;
+    background:#0d1121;
+    border-right:1px solid #20263a;
+    padding:30px 18px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:2px;
+    margin:0 0 43px 13px;
+}
+
+.logo span{
+    color:#4d8dff;
+}
+
+.nav-title{
+    color:#68738e;
+    font-size:11px;
+    letter-spacing:1.5px;
+    margin:0 0 20px 13px;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    height:48px;
+    padding:0 16px;
+    margin-bottom:4px;
+    border-radius:10px;
+    text-decoration:none;
+    color:#9da8c0;
+    font-size:14px;
+}
+
+.nav a:hover{
+    background:rgba(108,99,255,.10);
+    color:#fff;
+}
+
+.nav a.active{
+    background:linear-gradient(
+        90deg,
+        rgba(77,141,255,.22),
+        rgba(111,73,231,.20)
+    );
+    color:#fff;
+    border-left:3px solid #4d9cff;
+}
+
+.icon{
+    width:16px;
+    text-align:center;
+    font-size:15px;
+}
+
+.analysis-title{
+    color:#68738e;
+    font-size:11px;
+    letter-spacing:1.5px;
+    margin:28px 0 18px 13px;
+}
+
+.logout{
+    position:absolute;
+    bottom:34px;
+    left:18px;
+    right:18px;
+}
+
+.logout a{
+    color:#ef6464 !important;
+}
+
+.main{
+    margin-left:282px;
+    padding:48px 50px;
+}
+
+.header{
+    margin-bottom:28px;
+}
+
+.header h1{
+    font-size:31px;
+    font-weight:700;
+    margin-bottom:9px;
+}
+
+.header p{
+    color:#71809e;
+    font-size:14px;
+}
+
+.form-container{
+    width:1014px;
+    max-width:100%;
+    background:#111627;
+    border:1px solid #20283d;
+    border-radius:18px;
+    padding:36px 34px 34px;
+    box-shadow:0 20px 55px rgba(0,0,0,.20);
+}
+
+.form-title{
+    font-size:19px;
+    color:#f0f3fa;
+    margin-bottom:29px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:24px;
+    row-gap:25px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group.full{
+    grid-column:1 / -1;
+}
+
+label{
+    font-size:13px;
+    color:#91a0bd;
+    margin-bottom:10px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    background:#0d1322;
+    color:#edf1f8;
+    border:1px solid #202b40;
+    border-radius:10px;
+    outline:none;
+    font-size:13px;
+}
+
+input,
+select{
+    height:51px;
+    padding:0 16px;
+}
+
+textarea{
+    min-height:134px;
+    padding:16px;
+    resize:vertical;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#59657e;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#536cff;
+    box-shadow:0 0 0 2px rgba(83,108,255,.08);
+}
+
+select option{
+    background:#111627;
+    color:#fff;
+}
+
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:13px;
+    margin-top:31px;
+    padding-top:24px;
+    border-top:1px solid #20273a;
+}
+
+.btn{
+    height:48px;
+    padding:0 25px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.btn-cancel{
+    background:transparent;
+    border:1px solid #283147;
+    color:#9aa6bf;
+}
+
+.btn-cancel:hover{
+    background:#171d2d;
+}
+
+.btn-primary{
+    border:none;
+    color:#fff;
+    background:linear-gradient(135deg,#438cff,#7435e8);
+    box-shadow:0 8px 23px rgba(78,72,230,.25);
+}
+
+.btn-primary:hover{
+    transform:translateY(-1px);
+}
+
+.message{
+    display:none;
+    margin-top:18px;
+    padding:12px;
+    text-align:center;
+    border-radius:8px;
+    color:#6ee7a5;
+    background:rgba(50,200,130,.08);
+    border:1px solid rgba(50,200,130,.22);
+    font-size:13px;
+}
+
+@media(max-width:1000px){
+
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:220px;
+        padding:35px;
+    }
+
+    .form-container{
+        width:100%;
+    }
+}
+
+@media(max-width:700px){
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .logout{
+        position:relative;
+        bottom:auto;
+        left:auto;
+        right:auto;
+        margin-top:20px;
+    }
+
+    .main{
+        margin-left:0;
+        padding:25px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+    <div class="logo">
+        FORENSI<span>X</span>
+    </div>
+
+    <div class="nav">
+
+        <div class="nav-title">
+            MAIN
+        </div>
+
+        <a href="dashboard.html">
+            <span class="icon">▣</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="cases.html" class="active">
+            <span class="icon">📁</span>
+            <span>Cases</span>
+        </a>
+
+        <a href="suspects.html">
+            <span class="icon">♟</span>
+            <span>Suspects</span>
+        </a>
+
+        <a href="evidence.html">
+            <span class="icon">🔬</span>
+            <span>Evidence</span>
+        </a>
+
+        <a href="history.html">
+            <span class="icon">◷</span>
+            <span>Evidence History</span>
+        </a>
+
+        <div class="analysis-title">
+            ANALYSIS
+        </div>
+
+        <a href="matching.html">
+            <span class="icon">🎯</span>
+            <span>Matching</span>
+        </a>
+
+        <a href="reports.html">
+            <span class="icon">📊</span>
+            <span>Reports</span>
+        </a>
+
+        <div class="menu-title">System</div>
+        <a href="settings.html">
+            <span class="icon">⚙</span>
+            <span>Settings</span>
+        </a>
+
+    </div>
+
+    <div class="logout">
+
+        <a href="index.html">
+            <span class="icon">↪</span>
+            <span>Logout</span>
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+    <div class="header">
+
+        <h1>Create New Case</h1>
+
+        <p>
+            Register a new investigation case in the ForensiX system.
+        </p>
+
+    </div>
+
+
+    <div class="form-container">
+
+        <div class="form-title">
+            Case Information
+        </div>
+
+
+        <form id="caseForm">
+
+            <div class="form-grid">
+
+
+                <!-- CASE NUMBER -->
+                <div class="form-group">
+
+                    <label for="caseNumber">
+                        Case Number *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="caseNumber"
+                        placeholder="Example: C-005"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CASE TITLE -->
+                <div class="form-group">
+
+                    <label for="caseTitle">
+                        Case Title *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="caseTitle"
+                        placeholder="Example: Missing Laptop"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- LOCATION -->
+                <div class="form-group">
+
+                    <label for="location">
+                        Location *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Example: Computer Lab"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- INCIDENT DATE -->
+                <div class="form-group">
+
+                    <label for="incidentDate">
+                        Incident Date *
+                    </label>
+
+                    <input
+                        type="date"
+                        id="incidentDate"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CASE STATUS -->
+                <div class="form-group">
+
+                    <label for="status">
+                        Case Status
+                    </label>
+
+                    <select id="status">
+
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Under Review">
+                            Under Review
+                        </option>
+
+                        <option value="Closed">
+                            Closed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- INVESTIGATOR -->
+                <div class="form-group">
+
+                    <label for="investigator">
+                        Investigator
+                    </label>
+
+                    <input
+                        type="text"
+                        id="investigator"
+                        placeholder="Investigator"
+                    >
+
+                </div>
+
+
+                <!-- CASE DESCRIPTION -->
+                <div class="form-group full">
+
+                    <label for="description">
+                        Case Description *
+                    </label>
+
+                    <textarea
+                        id="description"
+                        placeholder="Enter a brief description of the incident..."
+                        required
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="actions">
+
+                <a
+                    href="cases.html"
+                    class="btn btn-cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Create Case
+                </button>
+
+            </div>
+
+
+            <!-- SUCCESS MESSAGE -->
+            <div
+                class="message"
+                id="message"
+            >
+                ✓ Case created successfully!
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document
+    .getElementById("caseForm")
+    .addEventListener("submit", async function(event){
+
+        event.preventDefault();
+
+        const newCase = {
+            caseNumber: document.getElementById("caseNumber").value,
+            caseTitle: document.getElementById("caseTitle").value,
+            location: document.getElementById("location").value,
+            incidentDate: document.getElementById("incidentDate").value,
+            status: document.getElementById("status").value,
+            investigator: document.getElementById("investigator").value,
+            description: document.getElementById("description").value
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/cases", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newCase)
+            });
+
+            if (response.ok) {
+                document
+                    .getElementById("message")
+                    .style.display = "block";
+
+                setTimeout(function(){
+                    window.location.href = "cases.html";
+                }, 1200);
+            } else {
+                await appAlert("Failed to create case.", "Error");
+            }
+        } catch (error) {
+            console.error("Error creating case:", error);
+            await appAlert("An error occurred while creating the case.", "Error");
+        }
+    });
+
+</script>
+
+</body>
+</html>

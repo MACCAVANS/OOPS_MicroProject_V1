@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForensiX | Login</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
+
+body{
+  min-height:100vh;
+  background:#080b16;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  width:600px;height:600px;
+  background:#3b82f6;
+  filter:blur(200px);
+  opacity:.10;
+  top:-200px;right:-150px;
+  z-index:0;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  width:500px;height:500px;
+  background:#8b5cf6;
+  filter:blur(200px);
+  opacity:.08;
+  bottom:-150px;left:-150px;
+  z-index:0;
+}
+
+.login-container{
+  width:100%;
+  max-width:420px;
+  position:relative;
+  z-index:1;
+}
+
+/* LOGO */
+.brand{
+  text-align:center;
+  margin-bottom:36px;
+}
+
+.brand-logo{
+  font-size:32px;
+  font-weight:800;
+  letter-spacing:3px;
+  margin-bottom:8px;
+}
+
+.brand-logo span{color:#60a5fa;}
+
+.brand-tagline{
+  color:#68748b;
+  font-size:13px;
+  letter-spacing:.5px;
+}
+
+/* CARD */
+.card{
+  background:rgba(17,22,41,.85);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;
+  padding:36px 32px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+  backdrop-filter:blur(20px);
+}
+
+.card h1{
+  font-size:22px;
+  margin-bottom:6px;
+}
+
+.card p{
+  color:#68748b;
+  font-size:13px;
+  margin-bottom:28px;
+}
+
+/* FORM */
+.form-group{margin-bottom:20px;}
+label{display:block;font-size:12px;font-weight:600;color:#68748b;text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px;}
+.input-wrap{position:relative;}
+.input-wrap .input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;}
+input{
+  width:100%;
+  height:48px;
+  background:#111629;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:11px;
+  color:white;
+  font-size:14px;
+  padding:0 15px 0 42px;
+  outline:none;
+  transition:.2s;
+}
+input::placeholder{color:#4b5563;}
+input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.10);}
+
+/* REMEMBER / FORGOT */
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font-size:13px;}
+.remember{display:flex;align-items:center;gap:8px;color:#aeb7ca;cursor:pointer;}
+.remember input{width:16px;height:16px;padding:0;accent-color:#3b82f6;}
+.forgot{color:#60a5fa;text-decoration:none;}
+.forgot:hover{text-decoration:underline;}
+
+/* SUBMIT */
+.login-btn{
+  width:100%;
+  height:48px;
+  background:linear-gradient(135deg,#3b82f6,#7c3aed);
+  color:white;
+  border:none;
+  border-radius:11px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 8px 25px rgba(59,130,246,.25);
+  transition:.25s;
+}
+.login-btn:hover{opacity:.9;transform:translateY(-1px);}
+.login-btn:active{transform:translateY(0);}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:12px;margin:22px 0;color:#374151;font-size:12px;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.07);}
+
+/* DEMO NOTICE */
+.demo-notice{
+  background:rgba(59,130,246,.06);
+  border:1px solid rgba(59,130,246,.12);
+  border-radius:10px;
+  padding:13px 16px;
+  font-size:12px;
+  color:#68748b;
+  line-height:1.6;
+  text-align:center;
+}
+
+/* FOOTER */
+.card-footer{text-align:center;margin-top:22px;font-size:12px;color:#68748b;}
+.card-footer a{color:#60a5fa;text-decoration:none;}
+.card-footer a:hover{text-decoration:underline;}
+
+/* RESPONSIVE */
+@media(max-width:480px){.card{padding:28px 20px;}}
+</style>
+</head>
+<body>
+
+<div class="login-container">
+
+  <div class="brand">
+    <div class="brand-logo">FORENSI<span>X</span></div>
+    <div class="brand-tagline">Investigation &amp; Evidence Management System</div>
+  </div>
+
+  <div class="card">
+    <h1>Sign in</h1>
+    <p>Access the ForensiX investigation portal.</p>
+
+    <form id="loginForm">
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="remember">
+          <input type="checkbox" id="rememberMe">
+          Remember me
+        </label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="login-btn">Sign In →</button>
+
+    </form>
+
+    <div class="divider">Demo Access</div>
+
+    <div class="demo-notice">
+      This is a frontend demonstration login.<br>
+      Enter any credentials and click <strong>Sign In</strong> to proceed.
+    </div>
+
+    <div class="card-footer">
+      <a href="dashboard.html">Skip to Dashboard →</a>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(ev){
+  ev.preventDefault();
+  const btn = document.querySelector('.login-btn');
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  setTimeout(()=>{ window.location.href = 'dashboard.html'; }, 800);
+});
+</script>
+</body>
+</html>

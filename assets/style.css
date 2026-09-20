@@ -1,0 +1,134 @@
+/* Global CSS Variables for Theming */
+:root {
+  /* Default Dark Theme */
+  --bg-color: #080b16;
+  --bg-gradient-1: #3b82f6;
+  --bg-gradient-2: #8b5cf6;
+  --sidebar-bg: rgba(13,17,32,.95);
+  --card-bg: rgba(17,22,41,.78);
+  --border-color: rgba(255,255,255,.08);
+  --text-primary: #ffffff;
+  --text-secondary: #7f8aa3;
+  --text-muted: #6b7280;
+  --input-bg: #111629;
+  --accent-color: #3b82f6;
+  --accent-gradient-start: #3b82f6;
+  --accent-gradient-end: #7c3aed;
+  
+  --shadow-color: rgba(59,130,246,.18);
+}
+
+[data-theme="light"] {
+  --bg-color: #f3f4f6;
+  --bg-gradient-1: #93c5fd;
+  --bg-gradient-2: #c4b5fd;
+  --sidebar-bg: rgba(255,255,255,.95);
+  --card-bg: rgba(255,255,255,.9);
+  --border-color: rgba(0,0,0,.08);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --input-bg: #ffffff;
+  --accent-color: #2563eb;
+  --accent-gradient-start: #3b82f6;
+  --accent-gradient-end: #6d28d9;
+  
+  --shadow-color: rgba(37,99,235,.15);
+}
+
+/* Base Body styles that can use variables */
+body {
+  background: var(--bg-color);
+  color: var(--text-primary);
+}
+
+/* Global App Modal Styles */
+.app-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+.app-modal-overlay.open {
+  display: flex;
+}
+.app-modal-box {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  text-align: center;
+}
+.app-modal-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.app-modal-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.app-modal-input {
+  width: 100%;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  outline: none;
+  font-size: 14px;
+}
+.app-modal-input:focus {
+  border-color: var(--accent-color);
+}
+.app-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.app-modal-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+.app-modal-btn-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+.app-modal-btn-cancel:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+}
+.app-modal-btn-primary {
+  background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+  color: white;
+  box-shadow: 0 8px 25px var(--shadow-color);
+}
+.app-modal-btn-primary:hover {
+  opacity: 0.9;
+}
+.app-modal-btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.app-modal-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}

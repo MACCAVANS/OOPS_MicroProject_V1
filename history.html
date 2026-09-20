@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForensiX | Evidence History</title>
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
+
+body{background:#080b16;color:white;min-height:100vh;}
+body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82f6;filter:blur(180px);opacity:.10;top:-150px;right:-100px;z-index:-1;}
+
+.layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:250px;background:rgba(13,17,32,.95);border-right:1px solid rgba(255,255,255,.08);padding:25px 16px;position:fixed;height:100vh;left:0;top:0;}
+.logo{font-size:25px;font-weight:800;letter-spacing:2px;padding:0 12px 30px;}
+.logo span{color:#60a5fa;}
+.menu-title{color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;padding:10px 12px;margin-top:8px;}
+.menu a{display:flex;align-items:center;gap:12px;text-decoration:none;color:#aeb7ca;padding:12px;border-radius:10px;margin:4px 0;transition:.25s;font-size:14px;}
+.menu a:hover,.menu a.active{background:linear-gradient(90deg,rgba(59,130,246,.18),rgba(139,92,246,.12));color:white;}
+.menu a.active{border-left:3px solid #60a5fa;}
+.icon{width:22px;text-align:center;font-size:17px;}
+.logout{position:absolute;bottom:25px;left:16px;right:16px;}
+.logout a{color:#f87171 !important;}
+
+/* MAIN */
+.main{margin-left:250px;width:calc(100% - 250px);padding:35px 40px;}
+
+/* HEADER */
+.header{margin-bottom:30px;}
+.header h1{font-size:30px;}
+.header p{color:#7f8aa3;font-size:14px;margin-top:6px;}
+
+/* SUMMARY CARDS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px;}
+.stat-card{background:rgba(18,23,42,.75);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:21px;transition:.3s;}
+.stat-card:hover{transform:translateY(-3px);border-color:rgba(96,165,250,.3);}
+.stat-card p{color:#7f8aa3;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.stat-card strong{font-size:26px;}
+
+/* FILTER CONTROLS */
+.tools{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+.search{flex:1;min-width:200px;background:#111629;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:13px 16px;color:white;outline:none;font-size:14px;}
+.search:focus{border-color:#3b82f6;}
+.filter{background:#111629;border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:13px 16px;color:#aeb7ca;outline:none;font-size:14px;cursor:pointer;}
+.filter:focus{border-color:#3b82f6;}
+
+/* TABLE CARD */
+.card{background:rgba(17,22,41,.78);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead{background:rgba(59,130,246,.06);}
+th{text-align:left;padding:16px 20px;font-size:11px;color:#68748b;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.07);}
+td{padding:17px 20px;font-size:13px;color:#c5ccda;border-bottom:1px solid rgba(255,255,255,.05);}
+tbody tr{transition:.2s;}
+tbody tr:hover{background:rgba(59,130,246,.05);}
+.evidence-id{color:#60a5fa;font-weight:700;}
+
+/* STATUS BADGES */
+.status{display:inline-block;padding:5px 10px;border-radius:20px;font-size:10px;font-weight:600;}
+.s-collected{background:rgba(168,85,247,.12);color:#c084fc;}
+.s-examination{background:rgba(234,179,8,.10);color:#fbbf24;}
+.s-examined{background:rgba(74,222,128,.10);color:#4ade80;}
+.s-stored{background:rgba(59,130,246,.10);color:#60a5fa;}
+.s-deleted{background:rgba(239,68,68,.10);color:#f87171;}
+
+/* NO RESULTS */
+.no-results{display:none;text-align:center;padding:45px;color:#68748b;}
+
+/* RESPONSIVE */
+@media(max-width:1000px){.stats{grid-template-columns:1fr 1fr;}.tools{flex-direction:column;}}
+@media(max-width:700px){
+  .sidebar{width:70px;padding:20px 8px;}
+  .logo{font-size:14px;padding:10px 5px 25px;}
+  .menu-title,.menu a span:not(.icon){display:none;}
+  .menu a{justify-content:center;}
+  .main{margin-left:70px;width:calc(100% - 70px);padding:20px;}
+  .stats{grid-template-columns:1fr;}
+  .card{overflow-x:auto;}
+  table{min-width:650px;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">FORENSI<span>X</span></div>
+  <div class="menu-title">Main</div>
+  <nav class="menu">
+    <a href="dashboard.html"><span class="icon">▣</span><span>Dashboard</span></a>
+    <a href="cases.html"><span class="icon">📁</span><span>Cases</span></a>
+    <a href="suspects.html"><span class="icon">👤</span><span>Suspects</span></a>
+    <a href="evidence.html"><span class="icon">🔬</span><span>Evidence</span></a>
+    <a href="history.html" class="active"><span class="icon">🕘</span><span>Evidence History</span></a>
+    <div class="menu-title">Analysis</div>
+    <a href="matching.html"><span class="icon">🎯</span><span>Matching</span></a>
+    <a href="reports.html"><span class="icon">📊</span><span>Reports</span></a>
+  </nav>
+  <div class="menu-title">System</div>
+  <nav class="menu">
+      <a href="settings.html"><span class="icon">⚙</span><span>Settings</span></a>
+  </nav>
+  <div class="logout"><nav class="menu"><a href="index.html"><span class="icon">↪</span><span>Logout</span></a></nav></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="header">
+    <h1>Evidence History</h1>
+    <p>Track the complete chain of custody for all collected evidence.</p>
+  </div>
+
+  <!-- SUMMARY STATS -->
+  <div class="stats">
+    <div class="stat-card"><p>Total Records</p><strong id="totalRecords">—</strong></div>
+    <div class="stat-card"><p>Evidence Items Tracked</p><strong id="trackedItems">—</strong></div>
+    <div class="stat-card"><p>Latest Activity</p><strong id="latestActivity" style="font-size:14px;line-height:1.4">—</strong></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="tools">
+    <input type="text" class="search" id="searchInput" placeholder="🔍  Search by evidence ID, handler or action...">
+    <select class="filter" id="statusFilter">
+      <option value="">All Status</option>
+      <option value="Collected">Collected</option>
+      <option value="Under Examination">Under Examination</option>
+      <option value="Examined">Examined</option>
+      <option value="Stored">Stored</option>
+      <option value="Deleted">Deleted</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>Evidence ID</th><th>Action</th><th>Handler</th><th>Date &amp; Time</th><th>Status</th></tr>
+      </thead>
+      <tbody id="historyTable"></tbody>
+    </table>
+    <div class="no-results" id="noResults">No history records found.</div>
+  </div>
+
+</main>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let allHistory = [];
+let allEvidence = [];
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function statusClass(s){return{Collected:'s-collected','Under Examination':'s-examination',Examined:'s-examined',Stored:'s-stored',Deleted:'s-deleted'}[s]||'s-collected';}
+function fmtDT(v){if(!v)return'—';const d=new Date(v);return isNaN(d)?v:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+', '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});}
+
+async function loadData(){
+  try{
+    const [hr,er]=await Promise.all([fetch(`${API}/api/history`),fetch(`${API}/api/evidence`)]);
+    if(hr.ok)allHistory=await hr.json();
+    if(er.ok)allEvidence=await er.json();
+    updateSummary();
+    renderTable();
+  }catch(e){console.error('Error loading history:',e);}
+}
+
+function updateSummary(){
+  document.getElementById('totalRecords').textContent=allHistory.length;
+  document.getElementById('trackedItems').textContent=new Set(allEvidence.map(e=>e.evidenceId)).size;
+  const latest=allHistory[0];
+  document.getElementById('latestActivity').textContent=latest?fmtDT(latest.timestamp):'—';
+}
+
+function renderTable(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const sf=document.getElementById('statusFilter').value;
+  const rows=allHistory.filter(h=>{
+    const text=[h.evidenceId,h.action,h.handler,h.status].join(' ').toLowerCase();
+    return(!q||text.includes(q))&&(!sf||h.status===sf);
+  });
+  document.getElementById('historyTable').innerHTML=rows.map(h=>`
+    <tr>
+      <td class="evidence-id">${esc(h.evidenceId)}</td>
+      <td>${esc(h.action)}</td>
+      <td>${esc(h.handler)}</td>
+      <td>${esc(fmtDT(h.timestamp))}</td>
+      <td><span class="status ${statusClass(h.status)}">${esc(h.status)}</span></td>
+    </tr>`).join('');
+  document.getElementById('noResults').style.display=rows.length?'none':'block';
+}
+
+document.getElementById('searchInput').addEventListener('input',renderTable);
+document.getElementById('statusFilter').addEventListener('change',renderTable);
+
+loadData();
+</script>
+</body>
+</html>
