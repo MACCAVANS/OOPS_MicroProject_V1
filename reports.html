@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="assets/style.css">
 <script src="assets/app.js"></script>
 <style>
+/* ── Original styles preserved exactly ── */
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
 
 body{background:#080b16;color:white;min-height:100vh;}
@@ -89,6 +90,146 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
   .header{flex-direction:column;align-items:flex-start;gap:15px;}
   .stats{grid-template-columns:1fr;}
 }
+
+/* ── NEW: Case selector in header ── */
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.case-select{
+  background:rgba(17,22,41,.9);
+  border:1px solid rgba(96,165,250,.3);
+  color:#e2e8f0;
+  padding:11px 14px;
+  border-radius:10px;
+  font-size:13px;
+  min-width:230px;
+  cursor:pointer;
+  outline:none;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2360a5fa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:34px;
+  transition:.2s;
+}
+.case-select:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.12);}
+.case-select option{background:#0d1120;color:#e2e8f0;}
+
+/* ── NEW: Report modal overlay ── */
+.rpt-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(4,6,14,.88);backdrop-filter:blur(6px);
+  overflow-y:auto;padding:30px 20px;
+}
+.rpt-overlay.open{display:flex;align-items:flex-start;justify-content:center;}
+.rpt-modal{
+  background:rgba(13,17,32,.98);
+  border:1px solid rgba(96,165,250,.18);
+  border-radius:20px;
+  width:100%;max-width:880px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  animation:rptIn .25s ease;
+}
+@keyframes rptIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+.rpt-header{
+  padding:28px 36px 22px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+}
+.rpt-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#60a5fa;margin-bottom:6px;}
+.rpt-main-title{font-size:22px;font-weight:700;}
+.rpt-meta{color:#7f8aa3;font-size:12px;margin-top:4px;}
+.rpt-close-btn{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+  color:#aeb7ca;border-radius:8px;padding:8px 12px;cursor:pointer;
+  font-size:16px;line-height:1;transition:.2s;flex-shrink:0;margin-top:2px;
+}
+.rpt-close-btn:hover{background:rgba(248,113,113,.12);color:#f87171;border-color:rgba(248,113,113,.3);}
+
+.rpt-body{padding:28px 36px;}
+
+.rpt-section{margin-bottom:28px;}
+.rpt-section-title{
+  font-size:11px;text-transform:uppercase;letter-spacing:1.8px;
+  color:#60a5fa;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.rpt-section-title::after{content:"";flex:1;height:1px;background:rgba(96,165,250,.15);}
+
+.rpt-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 24px;}
+.rpt-field{display:flex;flex-direction:column;gap:3px;}
+.rpt-field-label{font-size:10px;color:#68748b;text-transform:uppercase;letter-spacing:1px;}
+.rpt-field-value{font-size:13px;color:#e2e8f0;line-height:1.5;}
+
+.rpt-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid rgba(255,255,255,.07);}
+.rpt-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rpt-table th{
+  background:rgba(59,130,246,.08);padding:10px 14px;text-align:left;
+  color:#7f8aa3;font-weight:600;text-transform:uppercase;letter-spacing:.8px;font-size:10px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.rpt-table td{
+  padding:11px 14px;color:#c8d3e6;
+  border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;
+}
+.rpt-table tr:last-child td{border-bottom:none;}
+.rpt-table tr:hover td{background:rgba(96,165,250,.04);}
+
+.rpt-empty{color:#68748b;font-size:12px;font-style:italic;padding:14px 0 6px;}
+
+.rpt-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.rpt-b-active{background:rgba(74,222,128,.10);color:#4ade80;}
+.rpt-b-review{background:rgba(234,179,8,.10);color:#fbbf24;}
+.rpt-b-closed{background:rgba(59,130,246,.10);color:#60a5fa;}
+.rpt-b-default{background:rgba(148,163,184,.10);color:#94a3b8;}
+
+.rpt-state{padding:40px 0;text-align:center;color:#7f8aa3;font-size:14px;}
+.rpt-error{color:#f87171;}
+.rpt-spinner{
+  width:32px;height:32px;border:3px solid rgba(96,165,250,.2);
+  border-top-color:#60a5fa;border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 14px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.rpt-footer{
+  padding:18px 36px;border-top:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.rpt-footer-note{color:#68748b;font-size:11px;}
+.rpt-print-btn{
+  background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);
+  color:#60a5fa;padding:10px 18px;border-radius:9px;cursor:pointer;
+  font-size:13px;font-weight:600;transition:.2s;
+}
+.rpt-print-btn:hover{background:rgba(59,130,246,.22);}
+
+/* ── Print styles: show only the report modal ── */
+@media print{
+  body > *{display:none !important;}
+  .rpt-overlay{
+    display:block !important;position:static !important;
+    background:none !important;backdrop-filter:none !important;padding:0 !important;
+  }
+  .rpt-modal{
+    box-shadow:none !important;border:none !important;max-width:100% !important;
+    background:white !important;color:#111 !important;border-radius:0 !important;
+  }
+  .rpt-close-btn,.rpt-print-btn,.rpt-footer-note{display:none !important;}
+  .rpt-header,.rpt-body,.rpt-footer{padding:16px 24px !important;}
+  .rpt-main-title,.rpt-field-label,.rpt-field-value,
+  .rpt-table th,.rpt-table td,.rpt-label,.rpt-meta,.rpt-empty,
+  .rpt-section-title{color:#111 !important;}
+  .rpt-table th{background:#f1f5f9 !important;}
+  .rpt-section-title::after{background:#ccc !important;}
+  .rpt-table-wrap{border-color:#ddd !important;}
+  .rpt-table td,.rpt-table th{border-color:#ddd !important;}
+  .rpt-badge,.rpt-b-active,.rpt-b-review,.rpt-b-closed,.rpt-b-default{
+    background:#eee !important;color:#111 !important;border:1px solid #ccc !important;
+  }
+  .rpt-header{border-color:#ddd !important;}
+  .rpt-footer{border-color:#ddd !important;display:block !important;}
+}
 </style>
 </head>
 <body>
@@ -123,7 +264,12 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
       <h1>Investigation Reports</h1>
       <p>Review case activity, evidence records and investigation summaries.</p>
     </div>
-    <button class="generate-btn" onclick="generateReport()">+ Generate Report</button>
+    <div class="header-actions">
+      <select id="caseSelect" class="case-select">
+        <option value="">— Loading cases… —</option>
+      </select>
+      <button class="generate-btn" id="generateBtn" onclick="generateReport()">+ Generate Report</button>
+    </div>
   </div>
 
   <!-- STATS -->
@@ -224,10 +370,335 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
 </main>
 </div>
 
+<!-- ═══════════════════ INVESTIGATION REPORT MODAL ═══════════════════ -->
+<div class="rpt-overlay" id="rptOverlay">
+  <div class="rpt-modal" id="rptModal">
+
+    <!-- Modal header -->
+    <div class="rpt-header">
+      <div>
+        <div class="rpt-label">ForensiX · Investigation Report</div>
+        <div class="rpt-main-title" id="rptTitle">Loading…</div>
+        <div class="rpt-meta" id="rptMeta"></div>
+      </div>
+      <button class="rpt-close-btn" onclick="closeReport()" title="Close">✕</button>
+    </div>
+
+    <!-- Modal body – populated dynamically -->
+    <div class="rpt-body" id="rptBody">
+      <div class="rpt-state">
+        <div class="rpt-spinner"></div>
+        Fetching report data…
+      </div>
+    </div>
+
+    <!-- Modal footer -->
+    <div class="rpt-footer">
+      <span class="rpt-footer-note" id="rptFooterNote"></span>
+      <button class="rpt-print-btn" onclick="window.print()">🖨&nbsp; Print Report</button>
+    </div>
+
+  </div>
+</div>
+
 <script>
-async function generateReport(){
-  await appAlert('Report generation initiated.\n\nThis feature will be connected to the Java backend and database during integration.', 'Info');
+const API = 'https://navigate-thesis-temporary-quantum.trycloudflare.com';
+
+/* ─────────────────────────────────────────────
+   Populate case dropdown from /api/cases
+───────────────────────────────────────────── */
+async function loadCaseDropdown() {
+  const sel = document.getElementById('caseSelect');
+  try {
+    const res = await fetch(`${API}/api/cases`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const cases = await res.json();
+    if (!cases.length) {
+      sel.innerHTML = '<option value="">— No cases found in database —</option>';
+      return;
+    }
+    sel.innerHTML =
+      '<option value="">— Select a Case —</option>' +
+      cases
+        .sort((a, b) => (a.caseNumber || '').localeCompare(b.caseNumber || ''))
+        .map(c => `<option value="${esc(c.caseNumber)}">${esc(c.caseNumber)} · ${esc(c.caseTitle)}</option>`)
+        .join('');
+  } catch (err) {
+    sel.innerHTML = '<option value="">— Could not load cases —</option>';
+    console.error('Failed to load case dropdown:', err);
+  }
 }
+
+/* ─────────────────────────────────────────────
+   Main generate-report entry point
+───────────────────────────────────────────── */
+async function generateReport() {
+  const caseNumber = document.getElementById('caseSelect').value.trim();
+  if (!caseNumber) {
+    await appAlert('Please select a case from the dropdown before generating a report.', 'Select a Case');
+    return;
+  }
+
+  // Open modal with loading state immediately
+  showModalLoading(caseNumber);
+
+  try {
+    // Fetch all datasets in parallel
+    const [casesRes, suspectsRes, evidenceRes, historyRes] = await Promise.all([
+      fetch(`${API}/api/cases`),
+      fetch(`${API}/api/suspects`),
+      fetch(`${API}/api/evidence`),
+      fetch(`${API}/api/history`)
+    ]);
+
+    if (!casesRes.ok)     throw new Error(`Cases API returned HTTP ${casesRes.status}`);
+    if (!suspectsRes.ok)  throw new Error(`Suspects API returned HTTP ${suspectsRes.status}`);
+    if (!evidenceRes.ok)  throw new Error(`Evidence API returned HTTP ${evidenceRes.status}`);
+    if (!historyRes.ok)   throw new Error(`History API returned HTTP ${historyRes.status}`);
+
+    const [allCases, allSuspects, allEvidence, allHistory] = await Promise.all([
+      casesRes.json(), suspectsRes.json(), evidenceRes.json(), historyRes.json()
+    ]);
+
+    // Find the selected case object
+    const theCase = allCases.find(c => c.caseNumber === caseNumber);
+    if (!theCase) throw new Error(`Case "${caseNumber}" was not found in the database.`);
+
+    // Filter related records to this case
+    const suspects = allSuspects.filter(s => s.associatedCase === caseNumber);
+    const evidence = allEvidence.filter(e => e.caseId === caseNumber);
+    const evidenceIds = new Set(evidence.map(e => e.evidenceId));
+    const history   = allHistory.filter(h => evidenceIds.has(h.evidenceId));
+
+    // Render the report
+    renderReport(theCase, suspects, evidence, history);
+
+  } catch (err) {
+    showModalError(err.message);
+    console.error('Report generation failed:', err);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Modal state helpers
+───────────────────────────────────────────── */
+function showModalLoading(caseNumber) {
+  document.getElementById('rptOverlay').classList.add('open');
+  document.getElementById('rptTitle').textContent = caseNumber;
+  document.getElementById('rptMeta').textContent = 'Fetching data…';
+  document.getElementById('rptFooterNote').textContent = '';
+  document.getElementById('rptBody').innerHTML =
+    '<div class="rpt-state"><div class="rpt-spinner"></div>Fetching report data from backend…</div>';
+}
+
+function showModalError(message) {
+  document.getElementById('rptTitle').textContent = 'Report Error';
+  document.getElementById('rptMeta').textContent = '';
+  document.getElementById('rptBody').innerHTML = `
+    <div class="rpt-state rpt-error">
+      <div style="font-size:30px;margin-bottom:12px;">⚠</div>
+      <strong>Failed to generate report</strong>
+      <div style="font-size:12px;margin-top:8px;color:#fca5a5;">${esc(message)}</div>
+      <div style="font-size:11px;color:#68748b;margin-top:6px;">
+        Ensure the Spring Boot backend is running and reachable via the Cloudflare tunnel.
+      </div>
+    </div>`;
+}
+
+/* ─────────────────────────────────────────────
+   Render the full report
+───────────────────────────────────────────── */
+function renderReport(c, suspects, evidence, history) {
+  const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+  document.getElementById('rptTitle').textContent = `${c.caseNumber} · ${c.caseTitle}`;
+  document.getElementById('rptMeta').textContent  = `Generated on ${now}`;
+  document.getElementById('rptFooterNote').textContent =
+    `Case ${c.caseNumber}  ·  ${suspects.length} suspect(s)  ·  ${evidence.length} evidence item(s)  ·  ${history.length} history record(s)`;
+
+  document.getElementById('rptBody').innerHTML =
+    buildCaseSection(c) +
+    buildSuspectsSection(suspects) +
+    buildEvidenceSection(evidence) +
+    buildHistorySection(history);
+}
+
+/* ── Section: Case Information ── */
+function buildCaseSection(c) {
+  const fv = v => v ? esc(String(v)) : '<span style="color:#68748b">—</span>';
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">📁 Case Information</div>
+    <div class="rpt-info-grid">
+      <div class="rpt-field">
+        <div class="rpt-field-label">Case Number</div>
+        <div class="rpt-field-value">${fv(c.caseNumber)}</div>
+      </div>
+      <div class="rpt-field">
+        <div class="rpt-field-label">Case Title</div>
+        <div class="rpt-field-value">${fv(c.caseTitle)}</div>
+      </div>
+      <div class="rpt-field">
+        <div class="rpt-field-label">Location</div>
+        <div class="rpt-field-value">${fv(c.location)}</div>
+      </div>
+      <div class="rpt-field">
+        <div class="rpt-field-label">Incident Date</div>
+        <div class="rpt-field-value">${fv(c.incidentDate)}</div>
+      </div>
+      <div class="rpt-field">
+        <div class="rpt-field-label">Status</div>
+        <div class="rpt-field-value">
+          <span class="rpt-badge ${statusBadgeClass(c.status)}">${fv(c.status)}</span>
+        </div>
+      </div>
+      <div class="rpt-field">
+        <div class="rpt-field-label">Investigator</div>
+        <div class="rpt-field-value">${fv(c.investigator)}</div>
+      </div>
+      <div class="rpt-field" style="grid-column:1/-1">
+        <div class="rpt-field-label">Description</div>
+        <div class="rpt-field-value">${fv(c.description)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── Section: Suspects ── */
+function buildSuspectsSection(suspects) {
+  const rows = suspects.length
+    ? suspects.map(s => `
+        <tr>
+          <td>${esc(s.suspectId  || '—')}</td>
+          <td>${esc(s.fullName   || '—')}</td>
+          <td>${esc(s.location   || '—')}</td>
+          <td><span class="rpt-badge ${statusBadgeClass(s.status)}">${esc(s.status || '—')}</span></td>
+          <td>${esc(s.contactInfo|| '—')}</td>
+          <td>${esc(s.notes      || '—')}</td>
+        </tr>`).join('')
+    : `<tr><td colspan="6" class="rpt-empty">No records found for this case.</td></tr>`;
+
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">👤 Suspects (${suspects.length})</div>
+    <div class="rpt-table-wrap">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th>Suspect ID</th><th>Full Name</th><th>Location</th>
+            <th>Status</th><th>Contact Info</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Section: Evidence ── */
+function buildEvidenceSection(evidence) {
+  const rows = evidence.length
+    ? evidence.map(e => `
+        <tr>
+          <td>${esc(e.evidenceId     || '—')}</td>
+          <td>${esc(e.type          || '—')}</td>
+          <td>${esc(e.collectionDate|| '—')}</td>
+          <td>${esc(e.handler       || '—')}</td>
+          <td><span class="rpt-badge ${statusBadgeClass(e.status)}">${esc(e.status || '—')}</span></td>
+          <td>${esc(e.description   || '—')}</td>
+          <td>${esc(e.notes         || '—')}</td>
+        </tr>`).join('')
+    : `<tr><td colspan="7" class="rpt-empty">No records found for this case.</td></tr>`;
+
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">🔬 Evidence (${evidence.length})</div>
+    <div class="rpt-table-wrap">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th>Evidence ID</th><th>Type</th><th>Collection Date</th>
+            <th>Handler</th><th>Status</th><th>Description</th><th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Section: Evidence History / Chain of Custody ── */
+function buildHistorySection(history) {
+  const rows = history.length
+    ? history.map(h => {
+        const ts = h.timestamp
+          ? new Date(h.timestamp).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          : '—';
+        return `
+        <tr>
+          <td>${esc(h.evidenceId || '—')}</td>
+          <td>${esc(h.action    || '—')}</td>
+          <td>${esc(h.handler   || '—')}</td>
+          <td>${ts}</td>
+          <td><span class="rpt-badge ${statusBadgeClass(h.status)}">${esc(h.status || '—')}</span></td>
+        </tr>`;
+      }).join('')
+    : `<tr><td colspan="5" class="rpt-empty">No records found for this case.</td></tr>`;
+
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">🕘 Evidence History / Chain of Custody (${history.length})</div>
+    <div class="rpt-table-wrap">
+      <table class="rpt-table">
+        <thead>
+          <tr>
+            <th>Evidence ID</th><th>Action</th><th>Handler</th><th>Timestamp</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ─────────────────────────────────────────────
+   Close modal
+───────────────────────────────────────────── */
+function closeReport() {
+  document.getElementById('rptOverlay').classList.remove('open');
+}
+
+// Close on backdrop click
+document.getElementById('rptOverlay').addEventListener('click', function (e) {
+  if (e.target === this) closeReport();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeReport();
+});
+
+/* ─────────────────────────────────────────────
+   Utility helpers
+───────────────────────────────────────────── */
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
+}
+
+function statusBadgeClass(status) {
+  if (!status) return 'rpt-b-default';
+  const s = status.toLowerCase();
+  if (s.includes('active') || s.includes('collected') || s.includes('open'))                          return 'rpt-b-active';
+  if (s.includes('review') || s.includes('pending')   || s.includes('examination'))                   return 'rpt-b-review';
+  if (s.includes('closed') || s.includes('stored')    || s.includes('examined') || s.includes('deleted')) return 'rpt-b-closed';
+  return 'rpt-b-default';
+}
+
+/* ─────────────────────────────────────────────
+   Initialise
+───────────────────────────────────────────── */
+loadCaseDropdown();
 </script>
 </body>
 </html>
