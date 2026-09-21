@@ -25,13 +25,4 @@ public class EvidenceHistoryController {
     public ResponseEntity<List<EvidenceHistory>> getHistoryByEvidenceId(@PathVariable String evidenceId) {
         return ResponseEntity.ok(evidenceHistoryService.getHistoryByEvidenceId(evidenceId));
     }
-
-    @PostMapping
-    public ResponseEntity<EvidenceHistory> createHistory(@RequestBody EvidenceHistory history) {
-        try {
-            return ResponseEntity.ok(evidenceHistoryService.createHistory(history));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
 }
