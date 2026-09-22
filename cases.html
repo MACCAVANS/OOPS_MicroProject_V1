@@ -327,6 +327,121 @@ body::before{
         grid-template-columns:1fr;
     }
 }
+
+/* ── DOSSIER MODAL ── */
+.dossier-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    z-index: 9000;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px 16px;
+    overflow-y: auto;
+}
+.dossier-overlay.open { display: flex; }
+.dossier-box {
+    background: #0e1220;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 900px;
+    padding: 0;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    margin: auto;
+}
+.dossier-header {
+    background: linear-gradient(135deg, rgba(59,130,246,.2), rgba(124,58,237,.15));
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding: 28px 36px 22px;
+    border-radius: 18px 18px 0 0;
+    position: relative;
+}
+.dossier-header h2 { font-size: 22px; margin-bottom: 4px; }
+.dossier-header .d-case-num { color: #60a5fa; font-size: 13px; font-weight: 600; }
+.dossier-close {
+    position: absolute;
+    top: 18px; right: 22px;
+    background: none; border: none;
+    color: #7f8aa3; font-size: 22px;
+    cursor: pointer; line-height: 1;
+    padding: 4px 8px; border-radius: 6px;
+    transition: .2s;
+}
+.dossier-close:hover { background: rgba(255,255,255,.08); color: white; }
+.dossier-body { padding: 28px 36px; }
+.d-section {
+    margin-bottom: 32px;
+}
+.d-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #60a5fa;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(96,165,250,.2);
+}
+.d-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 24px;
+}
+.d-field label { font-size: 11px; color: #7f8aa3; display: block; margin-bottom: 2px; }
+.d-field span  { font-size: 13px; color: #e2e8f0; }
+.d-field.full  { grid-column: 1/-1; }
+.d-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+.d-card-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.d-card-field label { font-size: 10px; color: #7f8aa3; display: block; }
+.d-card-field span  { color: #e2e8f0; }
+.d-empty { color: #7f8aa3; font-size: 13px; font-style: italic; padding: 10px 0; }
+.d-loading { color: #7f8aa3; font-size: 13px; padding: 10px 0; }
+.d-error   { color: #f87171; font-size: 13px; padding: 10px 0; }
+.d-status-badge {
+    display: inline-block;
+    padding: 3px 9px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+}
+.d-status-active   { background: rgba(74,222,128,.12); color: #4ade80; }
+.d-status-examined { background: rgba(251,191,36,.12);  color: #fbbf24; }
+.d-status-other    { background: rgba(148,163,184,.12); color: #94a3b8; }
+.d-attach-card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+}
+.d-conclusion-area {
+    width: 100%; background: #111629;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px; padding: 12px 16px;
+    color: white; font-size: 13px;
+    font-family: "Segoe UI", sans-serif;
+    resize: vertical; min-height: 100px;
+    outline: none; box-sizing: border-box;
+}
+.d-conclusion-area:focus { border-color: #3b82f6; }
+.d-save-btn {
+    margin-top: 10px;
+    background: linear-gradient(135deg,#3b82f6,#7c3aed);
+    color: white; border: none;
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: .2s;
+}
+.d-save-btn:hover { opacity: .9; }
+.d-save-feedback { font-size: 12px; margin-left: 12px; }
 </style>
 </head>
 
@@ -383,11 +498,7 @@ body::before{
             <span>Reports</span>
         </a>
 
-        <div class="menu-title">System</div>
-        <a href="settings.html">
-            <span class="icon">⚙</span>
-            <span>Settings</span>
-        </a>
+
 
     </nav>
 
@@ -451,6 +562,20 @@ body::before{
 
 </div>
 
+<!-- DOSSIER MODAL -->
+<div class="dossier-overlay" id="dossierOverlay">
+  <div class="dossier-box">
+    <div class="dossier-header">
+      <button class="dossier-close" id="dossierClose">×</button>
+      <div class="d-case-num" id="dCaseNum"></div>
+      <h2 id="dCaseTitle"></h2>
+    </div>
+    <div class="dossier-body" id="dossierBody">
+      <div class="d-loading">Loading case...</div>
+    </div>
+  </div>
+</div>
+
 
 <script>
 
@@ -508,21 +633,230 @@ async function deleteCase(id) {
     }
 }
 
-async function viewCase(id) {
-    const c = allCases.find(x => x.id === id);
+/* ── helpers ── */
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(v){if(!v)return'—';const d=new Date(v+'T00:00:00');return isNaN(d)?v:d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDT(v){if(!v)return'—';const d=new Date(v);return isNaN(d)?v:d.toLocaleString();}
+function statusBadge(s){
+    const sl=(s||'').toLowerCase();
+    const cls=sl==='active'?'d-status-active':sl==='examined'?'d-status-examined':'d-status-other';
+    return `<span class="d-status-badge ${cls}">${esc(s||'—')}</span>`;
+}
+
+/* ── dossier open/close ── */
+const dossierOverlay = document.getElementById('dossierOverlay');
+const dossierBody    = document.getElementById('dossierBody');
+document.getElementById('dossierClose').addEventListener('click', () => dossierOverlay.classList.remove('open'));
+dossierOverlay.addEventListener('click', e => { if(e.target===dossierOverlay) dossierOverlay.classList.remove('open'); });
+
+/* ── main viewCase ── */
+async function viewCase(caseId) {
+    const c = allCases.find(x => x.id === caseId);
     if (!c) return;
-    const msg = `
-        Case Number: ${c.caseNumber}
-        Title: ${c.caseTitle}
-        Location: ${c.location}
-        Date: ${c.incidentDate}
-        Status: ${c.status}
-        Investigator: ${c.investigator || "N/A"}
-        
-        Description:
-        ${c.description || "No description provided."}
-    `;
-    await appAlert(msg, "Case Details");
+
+    // Show header immediately
+    document.getElementById('dCaseNum').textContent   = 'CASE ' + (c.caseNumber||'');
+    document.getElementById('dCaseTitle').textContent = c.caseTitle||'';
+    dossierBody.innerHTML = '<div class="d-loading">Loading case data...</div>';
+    dossierOverlay.classList.add('open');
+
+    // Fetch suspects + evidence in parallel (one request each)
+    let allSuspects = [], allEvidence = [];
+    try {
+        const [sRes, eRes] = await Promise.all([
+            fetch(`${API}/api/suspects`),
+            fetch(`${API}/api/evidence`)
+        ]);
+        if (sRes.ok) allSuspects = await sRes.json();
+        if (eRes.ok) allEvidence = await eRes.json();
+    } catch(err) { console.error('Dossier load error:', err); }
+
+    // Filter to this case (suspects use caseNumber via associatedCase; evidence uses caseId = caseNumber)
+    const caseSuspects = allSuspects.filter(s => s.associatedCase === c.caseNumber);
+    const caseEvidence = allEvidence.filter(e => e.caseId === c.caseNumber);
+
+    // Build HTML
+    let html = '';
+
+    /* 1. Overview */
+    html += `<div class="d-section">
+      <div class="d-section-title">Case Overview</div>
+      <div class="d-grid">
+        <div class="d-field"><label>Case Number</label><span>${esc(c.caseNumber)}</span></div>
+        <div class="d-field"><label>Status</label><span>${statusBadge(c.status)}</span></div>
+        <div class="d-field"><label>Location</label><span>${esc(c.location||'—')}</span></div>
+        <div class="d-field"><label>Incident Date</label><span>${esc(fmtDate(c.incidentDate))}</span></div>
+        <div class="d-field"><label>Investigator</label><span>${esc(c.investigator||'—')}</span></div>
+        <div class="d-field full"><label>Description</label><span>${esc(c.description||'No description provided.')}</span></div>
+        <div class="d-field full"><label>Conclusion</label><span id="dConclusionDisplay">${esc(c.conclusion||'No conclusion recorded.')}</span></div>
+      </div>
+    </div>`;
+
+    /* 2. Suspects */
+    html += `<div class="d-section"><div class="d-section-title">Suspects (${caseSuspects.length})</div><div id="dSuspects">`;
+    if (caseSuspects.length === 0) {
+        html += '<div class="d-empty">No suspects associated with this case.</div>';
+    } else {
+        caseSuspects.forEach(s => {
+            html += `<div class="d-card">
+              <div class="d-card-row">
+                <div class="d-card-field"><label>Suspect ID</label><span>${esc(s.suspectId)}</span></div>
+                <div class="d-card-field"><label>Full Name</label><span>${esc(s.fullName)}</span></div>
+                <div class="d-card-field"><label>Status</label><span>${esc(s.status||'—')}</span></div>
+                <div class="d-card-field"><label>Location</label><span>${esc(s.location||'—')}</span></div>
+              </div>
+              ${s.notes?`<div style="margin-top:8px; font-size:12px; color:#94a3b8;"><label style="font-size:10px; color:#7f8aa3;">Notes</label><br>${esc(s.notes)}</div>`:''}
+            </div>`;
+        });
+    }
+    html += '</div></div>';
+
+    /* 3. Evidence */
+    html += `<div class="d-section"><div class="d-section-title">Evidence (${caseEvidence.length})</div><div id="dEvidence">`;
+    if (caseEvidence.length === 0) {
+        html += '<div class="d-empty">No evidence associated with this case.</div>';
+    } else {
+        caseEvidence.forEach(e => {
+            html += `<div class="d-card">
+              <div class="d-card-row">
+                <div class="d-card-field"><label>Evidence ID</label><span>${esc(e.evidenceId)}</span></div>
+                <div class="d-card-field"><label>Type</label><span>${esc(e.type||'—')}</span></div>
+                <div class="d-card-field"><label>Collected</label><span>${esc(fmtDate(e.collectionDate))}</span></div>
+                <div class="d-card-field"><label>Handler</label><span>${esc(e.handler||'—')}</span></div>
+                <div class="d-card-field"><label>Status</label><span>${esc(e.status||'—')}</span></div>
+              </div>
+              ${e.description?`<div style="margin-top:8px; font-size:12px; color:#94a3b8;">${esc(e.description)}</div>`:''}
+            </div>`;
+        });
+    }
+    html += '</div></div>';
+
+    /* 4. Attachments placeholder */
+    html += `<div class="d-section"><div class="d-section-title">Attachments</div><div id="dAttachments"><div class="d-loading">Loading attachments...</div></div></div>`;
+
+    /* 5. Chain of Custody placeholder */
+    html += `<div class="d-section"><div class="d-section-title">Chain of Custody / History</div><div id="dHistory"><div class="d-loading">Loading history...</div></div></div>`;
+
+    /* 6. Conclusion editor */
+    html += `<div class="d-section">
+      <div class="d-section-title">Edit Conclusion</div>
+      <textarea class="d-conclusion-area" id="dConclusionInput" maxlength="3000" placeholder="Enter case conclusion...">${esc(c.conclusion||'')}</textarea>
+      <div style="display:flex;align-items:center;margin-top:10px;">
+        <button class="d-save-btn" id="dSaveConclusion">Save Conclusion</button>
+        <span class="d-save-feedback" id="dSaveFeedback"></span>
+      </div>
+    </div>`;
+
+    dossierBody.innerHTML = html;
+
+    /* Wire up save-conclusion button */
+    document.getElementById('dSaveConclusion').addEventListener('click', async () => {
+        const conclusionText = document.getElementById('dConclusionInput').value;
+        const feedback = document.getElementById('dSaveFeedback');
+        feedback.style.color = '#fbbf24';
+        feedback.textContent = 'Saving...';
+        try {
+            const res = await fetch(`${API}/api/cases/${c.id}/conclusion`, {
+                method: 'PATCH',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({conclusion: conclusionText})
+            });
+            if (res.ok) {
+                const updated = await res.json();
+                // Update allCases in memory
+                const idx = allCases.findIndex(x => x.id === c.id);
+                if (idx !== -1) allCases[idx].conclusion = updated.conclusion;
+                c.conclusion = updated.conclusion;
+                document.getElementById('dConclusionDisplay').textContent = updated.conclusion || 'No conclusion recorded.';
+                feedback.style.color = '#4ade80';
+                feedback.textContent = '✓ Saved';
+                setTimeout(() => feedback.textContent = '', 3000);
+            } else {
+                feedback.style.color = '#f87171';
+                feedback.textContent = `✗ Failed (HTTP ${res.status})`;
+            }
+        } catch(err) {
+            feedback.style.color = '#f87171';
+            feedback.textContent = '✗ Network error';
+        }
+    });
+
+    /* Load attachments + history asynchronously per evidence item */
+    await loadDossierAttachmentsAndHistory(caseEvidence);
+}
+
+async function loadDossierAttachmentsAndHistory(caseEvidence) {
+    const attContainer  = document.getElementById('dAttachments');
+    const histContainer = document.getElementById('dHistory');
+    if (!attContainer || !histContainer) return;
+
+    if (caseEvidence.length === 0) {
+        attContainer.innerHTML  = '<div class="d-empty">No attachments.</div>';
+        histContainer.innerHTML = '<div class="d-empty">No history recorded.</div>';
+        return;
+    }
+
+    // Fetch attachments + history for each evidence item in parallel
+    let allAttachments = [], allHistoryEntries = [];
+    await Promise.all(caseEvidence.map(async (ev) => {
+        try {
+            const [aRes, hRes] = await Promise.all([
+                fetch(`${API}/api/evidence/${ev.evidenceId}/attachments`),
+                fetch(`${API}/api/history/evidence/${ev.evidenceId}`)
+            ]);
+            if (aRes.ok) { const a = await aRes.json(); allAttachments = allAttachments.concat(a); }
+            if (hRes.ok) { const h = await hRes.json(); allHistoryEntries = allHistoryEntries.concat(h); }
+        } catch(err) { console.warn('Failed loading data for evidence', ev.evidenceId, err); }
+    }));
+
+    /* Render attachments */
+    if (allAttachments.length === 0) {
+        attContainer.innerHTML = '<div class="d-empty">No attachments.</div>';
+    } else {
+        let aHtml = '';
+        allAttachments.forEach(a => {
+            const attId    = a.id;
+            const filename = esc(a.originalFilename || a.original_filename || 'Unknown File');
+            const type     = (a.contentType || a.content_type || '').toLowerCase();
+            const url      = `${API}/api/evidence/attachments/${attId}/download`;
+            const size     = (a.fileSize||0) > 1048576 ? ((a.fileSize||0)/1048576).toFixed(1)+' MB' : ((a.fileSize||0)/1024).toFixed(1)+' KB';
+            const date     = a.uploadTimestamp ? fmtDT(a.uploadTimestamp) : 'N/A';
+            const evId     = esc(a.evidenceId||'');
+
+            aHtml += `<div class="d-attach-card">`;
+            aHtml += `<div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><strong>${filename}</strong> <span style="color:#7f8aa3;font-size:11px;">(${size})</span><br><span style="color:#7f8aa3;font-size:11px;">Evidence: ${evId} &nbsp;|&nbsp; Uploaded: ${date}</span></div>`;
+            aHtml += `<a href="${url}" target="_blank" style="color:#60a5fa;font-size:12px;font-weight:600;white-space:nowrap;margin-left:12px;">Open / Download</a></div>`;
+            if (type.startsWith('image/')) {
+                aHtml += `<img src="${url}" style="max-width:100%;max-height:180px;object-fit:contain;border-radius:6px;display:block;margin-top:8px;">`;
+            } else if (type.startsWith('video/')) {
+                aHtml += `<video controls style="max-width:100%;max-height:180px;border-radius:6px;display:block;margin-top:8px;"><source src="${url}" type="${type}">Your browser does not support video.</video>`;
+            } else if (type === 'application/pdf') {
+                aHtml += `<object data="${url}" type="application/pdf" width="100%" height="180px" style="border-radius:6px;margin-top:8px;"><div style="padding:8px;"><a href="${url}" target="_blank" style="color:#60a5fa;">View PDF</a></div></object>`;
+            }
+            aHtml += `</div>`;
+        });
+        attContainer.innerHTML = aHtml;
+    }
+
+    /* Render history — sort chronologically ascending */
+    allHistoryEntries.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+    if (allHistoryEntries.length === 0) {
+        histContainer.innerHTML = '<div class="d-empty">No history recorded.</div>';
+    } else {
+        let hHtml = '';
+        allHistoryEntries.forEach(h => {
+            hHtml += `<div class="d-card">
+              <div class="d-card-row">
+                <div class="d-card-field"><label>Action</label><span>${esc(h.action||'—')}</span></div>
+                <div class="d-card-field"><label>Evidence ID</label><span>${esc(h.evidenceId||'—')}</span></div>
+                <div class="d-card-field"><label>Handler</label><span>${esc(h.handler||'—')}</span></div>
+                <div class="d-card-field"><label>Status</label><span>${esc(h.status||'—')}</span></div>
+                <div class="d-card-field"><label>Timestamp</label><span>${fmtDT(h.timestamp)}</span></div>
+              </div>
+            </div>`;
+        });
+        histContainer.innerHTML = hHtml;
+    }
 }
 
 function renderCases() {
