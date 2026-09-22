@@ -222,7 +222,7 @@ function renderTable(){
   document.getElementById('noResults').style.display=rows.length?'none':'block';
 }
 
-function viewEvidence(id){
+async function viewEvidence(id){
   const e=allEvidence.find(x=>x.id===id);if(!e)return;
   document.getElementById('modalContent').innerHTML=`
     <b>Evidence ID</b><span>${esc(e.evidenceId)}</span>
@@ -232,8 +232,85 @@ function viewEvidence(id){
     <b>Handler</b><span>${esc(e.handler)}</span>
     <b>Status</b><span><span class="status ${statusClass(e.status)}">${esc(e.status)}</span></span>
     <b>Description</b><span>${esc(e.description||'—')}</span>
-    <b>Notes</b><span>${esc(e.notes||'—')}</span>`;
+    <b>Notes</b><span>${esc(e.notes||'—')}</span>
+    <b style="grid-column:1/-1; margin-top: 15px; padding-top:15px; border-top: 1px solid rgba(255,255,255,0.1);">Attachments</b>
+    <span style="grid-column:1/-1" id="attachmentsContainer">
+        <div style="color:#7f8aa3; font-size:13px; text-align:center; padding:10px;">Loading attachments...</div>
+    </span>`;
   document.getElementById('modal').classList.add('open');
+  await loadAttachmentsForEvidence(e.evidenceId);
+}
+
+async function loadAttachmentsForEvidence(evidenceId) {
+    const container = document.getElementById('attachmentsContainer');
+    try {
+        const r = await fetch(`${API}/api/evidence/${evidenceId}/attachments`);
+        if (!r.ok) {
+            container.innerHTML = `<div style="color:#f87171; font-size:13px; text-align:center; padding:10px;">Failed to load attachments (HTTP ${r.status})</div>`;
+            return;
+        }
+        const attachments = await r.json();
+        if (!attachments || attachments.length === 0) {
+            container.innerHTML = `<div style="color:#7f8aa3; font-size:13px; text-align:center; padding:10px;">No attachments</div>`;
+            return;
+        }
+        
+        let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+        attachments.forEach(a => {
+            const attId = a.id;
+            const filename = esc(a.originalFilename || a.original_filename || 'Unknown File');
+            const type = (a.contentType || a.content_type || '').toLowerCase();
+            const url = `${API}/api/evidence/attachments/${attId}/download`;
+            const size = (a.fileSize || 0) > 1048576 ? ((a.fileSize || 0)/1048576).toFixed(1)+' MB' : ((a.fileSize || 0)/1024).toFixed(1)+' KB';
+            const date = a.uploadTimestamp ? new Date(a.uploadTimestamp).toLocaleString() : 'N/A';
+            
+            html += `<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); position:relative;">`;
+            html += `<div style="display:flex; justify-content:space-between; margin-bottom:8px;">`;
+            html += `<div style="font-weight:600; font-size:13px; word-break:break-all;">${filename} <span style="color:#7f8aa3; font-weight:normal; font-size:11px;">(${size})</span></div>`;
+            html += `<button onclick="deleteAttachment('${evidenceId}', ${attId}, '${filename.replace(/'/g, "\\'")}')" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:12px; font-weight:bold;">Delete</button>`;
+            html += `</div>`;
+            
+            if (type.startsWith('image/')) {
+                html += `<img src="${url}" style="max-width:100%; max-height:200px; object-fit:contain; border-radius:4px; display:block; margin-top:5px; margin-bottom:5px;">`;
+            } else if (type === 'application/pdf') {
+                html += `<object data="${url}" type="application/pdf" width="100%" height="200px" style="border-radius:4px; margin-top:5px; margin-bottom:5px;">
+                            <div style="padding:10px; text-align:center;"><a href="${url}" target="_blank" style="color:#60a5fa; font-size:13px;">View PDF</a></div>
+                         </object>`;
+            } else if (type.startsWith('video/')) {
+                html += `<video controls style="max-width:100%; max-height:200px; border-radius:4px; display:block; margin-top:5px; margin-bottom:5px;">
+                            <source src="${url}" type="${type}">
+                            Your browser does not support the video tag.
+                         </video>`;
+            }
+            
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">`;
+            html += `<span style="color:#7f8aa3; font-size:11px;">Uploaded: ${date}</span>`;
+            html += `<a href="${url}" target="_blank" style="color:#60a5fa; font-size:12px; text-decoration:none; font-weight:bold;">Open / Download</a>`;
+            html += `</div>`;
+            html += `</div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+        
+    } catch (err) {
+        container.innerHTML = `<div style="color:#f87171; font-size:13px; text-align:center; padding:10px;">Failed to load attachments.</div>`;
+    }
+}
+
+async function deleteAttachment(evidenceId, attachmentId, filename) {
+    if(!await appConfirm(`Are you sure you want to delete the attachment: ${filename}?`, "Delete Attachment", true)) return;
+    try {
+        const r = await fetch(`${API}/api/evidence/attachments/${attachmentId}`, { method: 'DELETE' });
+        if(r.ok) {
+            await loadAttachmentsForEvidence(evidenceId);
+        } else {
+            const err = await r.text();
+            await appAlert('Failed to delete attachment: ' + (err || r.status), 'Error');
+        }
+    } catch (err) {
+        console.error(err);
+        await appAlert('Error deleting attachment: ' + err.message, 'Error');
+    }
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 document.getElementById('modal').addEventListener('click',function(ev){if(ev.target===this)closeModal();});

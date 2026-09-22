@@ -182,6 +182,13 @@ select option{background:#111629;}
           <textarea id="investigationNotes" placeholder="Add examination notes or additional observations..."></textarea>
         </div>
 
+        <div class="form-group full">
+          <label for="evidenceAttachments">Attachments</label>
+          <input type="file" id="evidenceAttachments" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.txt,.mp4,.webm,.mov" style="padding: 13px 16px;">
+          <div style="font-size: 11px; color: #68738e; margin-top: 6px;">Supported: JPG, JPEG, PNG, WEBP, PDF, DOC, DOCX, TXT, MP4, WEBM, MOV</div>
+        </div>
+
+
       </div>
 
       <div class="notice">🔒 Evidence records should be handled carefully. All evidence actions are tracked in the Evidence History module for chain-of-custody auditing.</div>
@@ -221,8 +228,9 @@ async function loadCases(){
 
 document.getElementById('evidenceForm').addEventListener('submit', async function(ev){
   ev.preventDefault();
+  const evidenceId = document.getElementById('evidenceId').value.trim();
   const payload = {
-    evidenceId: document.getElementById('evidenceId').value.trim(),
+    evidenceId: evidenceId,
     type: document.getElementById('evidenceType').value,
     caseId: document.getElementById('associatedCase').value,
     collectionDate: document.getElementById('collectionDate').value || null,
@@ -233,14 +241,55 @@ document.getElementById('evidenceForm').addEventListener('submit', async functio
   };
   try{
     const r=await fetch(`${API}/api/evidence`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(r.ok){
-      const msg=document.getElementById('message');
-      msg.style.display='block';
-      setTimeout(()=>{window.location.href='evidence.html';},900);
-    } else {
+    if(!r.ok){
       const err=await r.text();
       await appAlert('Failed to add evidence: '+(err||r.status), 'Error');
+      return;
     }
+    
+    const fileInput = document.getElementById('evidenceAttachments');
+    const files = fileInput.files;
+    let uploadErrors = [];
+    const msg = document.getElementById('message');
+    
+    if (files.length > 0) {
+      msg.textContent = 'Uploading attachments...';
+      msg.style.display = 'block';
+      msg.style.color = '#fbbf24';
+      msg.style.backgroundColor = 'rgba(251,191,36,.1)';
+      msg.style.borderColor = 'rgba(251,191,36,.2)';
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+          const uploadRes = await fetch(`${API}/api/evidence/${evidenceId}/attachments`, {
+            method: 'POST',
+            body: formData
+          });
+          if (!uploadRes.ok) throw new Error(`HTTP ${uploadRes.status}`);
+        } catch (err) {
+          uploadErrors.push(file.name);
+        }
+      }
+    }
+    
+    if (uploadErrors.length > 0) {
+      msg.textContent = 'Evidence added, but failed to upload: ' + uploadErrors.join(', ');
+      msg.style.color = '#f87171';
+      msg.style.backgroundColor = 'rgba(248,113,113,.1)';
+      msg.style.borderColor = 'rgba(248,113,113,.2)';
+    } else {
+      msg.textContent = files.length > 0 ? '✓ Evidence and attachments added successfully!' : '✓ Evidence added successfully!';
+      msg.style.color = '#6ee7a5';
+      msg.style.backgroundColor = 'rgba(50,200,130,.08)';
+      msg.style.borderColor = 'rgba(50,200,130,.22)';
+    }
+    msg.style.display = 'block';
+    
+    setTimeout(()=>{window.location.href='evidence.html';}, 1800);
+    
   }catch(e){await appAlert('Error: '+e.message, 'Error');}
 });
 
