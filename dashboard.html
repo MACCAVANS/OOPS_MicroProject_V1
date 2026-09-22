@@ -472,12 +472,6 @@
                 <span>Reports</span>
             </a>
 
-            <div class="menu-title">System</div>
-            <a href="settings.html">
-                <span class="icon">⚙</span>
-                <span>Settings</span>
-            </a>
-
         </nav>
 
         <div class="logout">
@@ -521,37 +515,37 @@
             <div class="stat-card">
                 <div class="stat-top">
                     <span class="stat-icon">📁</span>
-                    <span class="trend">↑ 12%</span>
+                    <span class="trend" id="statCaseTrend">—</span>
                 </div>
-                <h2>24</h2>
+                <h2 id="statCases">—</h2>
                 <p>Total Cases</p>
             </div>
 
             <div class="stat-card">
                 <div class="stat-top">
                     <span class="stat-icon">🔬</span>
-                    <span class="trend">↑ 8%</span>
+                    <span class="trend" id="statEvidenceTrend">—</span>
                 </div>
-                <h2>86</h2>
+                <h2 id="statEvidence">—</h2>
                 <p>Evidence Items</p>
             </div>
 
             <div class="stat-card">
                 <div class="stat-top">
                     <span class="stat-icon">👤</span>
-                    <span class="trend">↑ 5%</span>
+                    <span class="trend" id="statSuspectTrend">—</span>
                 </div>
-                <h2>47</h2>
+                <h2 id="statSuspects">—</h2>
                 <p>Suspects</p>
             </div>
 
             <div class="stat-card">
                 <div class="stat-top">
-                    <span class="stat-icon">🎯</span>
-                    <span class="trend">Active</span>
+                    <span class="stat-icon">📋</span>
+                    <span class="trend" id="statActiveTrend">Active</span>
                 </div>
-                <h2>18</h2>
-                <p>Potential Matches</p>
+                <h2 id="statActive">—</h2>
+                <p>Active Cases</p>
             </div>
 
         </div>
@@ -597,7 +591,7 @@
 
                 <div class="section-title">
                     <h2>Recent Cases</h2>
-                    <span>View all</span>
+                    <a href="cases.html" style="color:#60a5fa;font-size:12px;text-decoration:none;">View all</a>
                 </div>
 
                 <table>
@@ -610,26 +604,8 @@
                         </tr>
                     </thead>
 
-                    <tbody>
-
-                        <tr>
-                            <td>C-001 · College Laptop Theft</td>
-                            <td>Computer Lab</td>
-                            <td><span class="status">Active</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>C-002 · Missing Device</td>
-                            <td>Library</td>
-                            <td><span class="status">Active</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>C-003 · Property Damage</td>
-                            <td>Block B</td>
-                            <td><span class="status">Examined</span></td>
-                        </tr>
-
+                    <tbody id="recentCasesBody">
+                        <tr><td colspan="3" style="color:#7f8aa3;padding:20px;text-align:center;">Loading...</td></tr>
                     </tbody>
 
                 </table>
@@ -637,47 +613,16 @@
             </div>
 
 
-            <!-- ACTIVITY -->
+            <!-- RECENT EVIDENCE -->
 
             <div class="panel">
 
                 <div class="section-title">
-                    <h2>Recent Activity</h2>
-                    <span>Today</span>
+                    <h2>Recent Evidence</h2>
+                    <a href="evidence.html" style="color:#60a5fa;font-size:12px;text-decoration:none;">View all</a>
                 </div>
 
-                <div class="activity">
-
-                    <div class="activity-icon">🔬</div>
-
-                    <div>
-                        <p>New fingerprint evidence added</p>
-                        <small>10 minutes ago · Case C-001</small>
-                    </div>
-
-                </div>
-
-                <div class="activity">
-
-                    <div class="activity-icon">🎯</div>
-
-                    <div>
-                        <p>Potential suspect match generated</p>
-                        <small>32 minutes ago · Case C-001</small>
-                    </div>
-
-                </div>
-
-                <div class="activity">
-
-                    <div class="activity-icon">📁</div>
-
-                    <div>
-                        <p>Case C-003 status updated</p>
-                        <small>1 hour ago</small>
-                    </div>
-
-                </div>
+                <div id="recentEvidenceList" style="color:#7f8aa3;padding:20px;text-align:center;">Loading...</div>
 
             </div>
 
@@ -686,6 +631,86 @@
     </main>
 
 </div>
+
+<script>
+const API = 'https://acts-allowance-sie-william.trycloudflare.com';
+
+function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
+}
+
+async function loadDashboard() {
+    try {
+        const [casesRes, evidenceRes, suspectsRes] = await Promise.all([
+            fetch(`${API}/api/cases`),
+            fetch(`${API}/api/evidence`),
+            fetch(`${API}/api/suspects`)
+        ]);
+
+        const cases     = casesRes.ok     ? await casesRes.json()     : [];
+        const evidence  = evidenceRes.ok  ? await evidenceRes.json()  : [];
+        const suspects  = suspectsRes.ok  ? await suspectsRes.json()  : [];
+
+        /* ── Stat cards ── */
+        const activeCases = cases.filter(c => (c.status || '').toLowerCase() === 'active').length;
+        document.getElementById('statCases').textContent    = cases.length;
+        document.getElementById('statEvidence').textContent = evidence.length;
+        document.getElementById('statSuspects').textContent = suspects.length;
+        document.getElementById('statActive').textContent   = activeCases;
+        document.getElementById('statCaseTrend').textContent     = cases.length     ? 'Loaded' : 'None';
+        document.getElementById('statEvidenceTrend').textContent = evidence.length  ? 'Loaded' : 'None';
+        document.getElementById('statSuspectTrend').textContent  = suspects.length  ? 'Loaded' : 'None';
+        document.getElementById('statActiveTrend').textContent   = activeCases > 0  ? 'Active'  : 'None';
+
+        /* ── Recent Cases table (up to 5 most recent by id desc) ── */
+        const tbody = document.getElementById('recentCasesBody');
+        const recent = [...cases].sort((a, b) => b.id - a.id).slice(0, 5);
+        if (recent.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="color:#7f8aa3;padding:20px;text-align:center;">No cases found.</td></tr>';
+        } else {
+            tbody.innerHTML = recent.map(c => `
+                <tr>
+                    <td>${esc(c.caseNumber)} · ${esc(c.caseTitle || '—')}</td>
+                    <td>${esc(c.location || '—')}</td>
+                    <td><span class="status">${esc(c.status || '—')}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        /* ── Recent Evidence list (up to 5 most recent by id desc) ── */
+        const evList = document.getElementById('recentEvidenceList');
+        const recentEv = [...evidence].sort((a, b) => b.id - a.id).slice(0, 5);
+        if (recentEv.length === 0) {
+            evList.textContent = 'No evidence records found.';
+        } else {
+            evList.innerHTML = recentEv.map(e => `
+                <div class="activity">
+                    <div class="activity-icon">🔬</div>
+                    <div>
+                        <p>${esc(e.evidenceId)} — ${esc(e.type || '—')}</p>
+                        <small>Case: ${esc(e.caseId || '—')} · Handler: ${esc(e.handler || '—')}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+    } catch (err) {
+        console.error('Dashboard load error:', err);
+        document.getElementById('statCases').textContent    = 'Err';
+        document.getElementById('statEvidence').textContent = 'Err';
+        document.getElementById('statSuspects').textContent = 'Err';
+        document.getElementById('statActive').textContent   = 'Err';
+        document.getElementById('recentCasesBody').innerHTML =
+            '<tr><td colspan="3" style="color:#f87171;padding:20px;text-align:center;">Could not load data. Check backend connection.</td></tr>';
+        document.getElementById('recentEvidenceList').innerHTML =
+            '<div style="color:#f87171;padding:20px;text-align:center;">Could not load data. Check backend connection.</div>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
 
 </body>
 </html>
