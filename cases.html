@@ -460,17 +460,31 @@ const statusFilter = document.getElementById("statusFilter");
 const caseGrid = document.getElementById("caseGrid");
 let allCases = [];
 
-async function loadCases() {
+async function loadCases(retries = 2) {
     try {
         const response = await fetch(`${API}/api/cases`);
-        if (response.ok) {
+        
+        // Check if Cloudflare intercepted with an HTML splash screen/challenge
+        const contentType = response.headers.get("content-type");
+        if (response.ok && contentType && contentType.includes("application/json")) {
             allCases = await response.json();
             renderCases();
         } else {
+            // Either not OK, or not JSON (e.g., Cloudflare HTML challenge)
+            if (retries > 0) {
+                console.warn(`Transient fetch issue (Status: ${response.status}, Type: ${contentType}). Retrying...`);
+                setTimeout(() => loadCases(retries - 1), 1000);
+                return;
+            }
             caseGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #f87171;">Unable to load cases. Please check the backend connection (HTTP ${response.status}).</div>`;
-            console.error("Failed to fetch cases");
+            console.error("Failed to fetch cases. Response was not OK or not JSON.");
         }
     } catch (error) {
+        if (retries > 0) {
+            console.warn(`Network error fetching cases. Retrying...`, error);
+            setTimeout(() => loadCases(retries - 1), 1000);
+            return;
+        }
         caseGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #f87171;">Unable to load cases. Please check the backend connection.</div>`;
         console.error("Error loading cases:", error);
     }
