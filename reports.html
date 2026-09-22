@@ -249,9 +249,6 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
     <a href="matching.html"><span class="icon">🎯</span><span>Matching</span></a>
     <a href="reports.html" class="active"><span class="icon">📊</span><span>Reports</span></a>
   </nav>
-  <div class="menu-title">System</div>
-  <nav class="menu">
-      <a href="settings.html"><span class="icon">⚙</span><span>Settings</span></a>
   </nav>
   <div class="logout"><nav class="menu"><a href="index.html"><span class="icon">↪</span><span>Logout</span></a></nav></div>
 </aside>
@@ -443,12 +440,13 @@ async function generateReport() {
   showModalLoading(caseNumber);
 
   try {
-    // Fetch all datasets in parallel
-    const [casesRes, suspectsRes, evidenceRes, historyRes] = await Promise.all([
+    // Fetch all datasets in parallel, plus the narrative
+    const [casesRes, suspectsRes, evidenceRes, historyRes, narrativeRes] = await Promise.all([
       fetch(`${API}/api/cases`),
       fetch(`${API}/api/suspects`),
       fetch(`${API}/api/evidence`),
-      fetch(`${API}/api/history`)
+      fetch(`${API}/api/history`),
+      fetch(`${API}/api/reports/${caseNumber}/narrative`, { method: 'POST' })
     ]);
 
     if (!casesRes.ok)     throw new Error(`Cases API returned HTTP ${casesRes.status}`);
@@ -459,6 +457,13 @@ async function generateReport() {
     const [allCases, allSuspects, allEvidence, allHistory] = await Promise.all([
       casesRes.json(), suspectsRes.json(), evidenceRes.json(), historyRes.json()
     ]);
+    
+    let narrativeData = null;
+    if (narrativeRes.ok) {
+        narrativeData = await narrativeRes.json();
+    } else {
+        console.warn(`Narrative API failed with status ${narrativeRes.status}`);
+    }
 
     // Find the selected case object
     const theCase = allCases.find(c => c.caseNumber === caseNumber);
@@ -471,7 +476,7 @@ async function generateReport() {
     const history   = allHistory.filter(h => evidenceIds.has(h.evidenceId));
 
     // Render the report
-    renderReport(theCase, suspects, evidence, history);
+    renderReport(theCase, suspects, evidence, history, narrativeData);
 
   } catch (err) {
     showModalError(err.message);
@@ -508,7 +513,7 @@ function showModalError(message) {
 /* ─────────────────────────────────────────────
    Render the full report
 ───────────────────────────────────────────── */
-function renderReport(c, suspects, evidence, history) {
+function renderReport(c, suspects, evidence, history, narrativeData) {
   const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
   document.getElementById('rptTitle').textContent = `${c.caseNumber} · ${c.caseTitle}`;
   document.getElementById('rptMeta').textContent  = `Generated on ${now}`;
@@ -517,6 +522,8 @@ function renderReport(c, suspects, evidence, history) {
 
   document.getElementById('rptBody').innerHTML =
     buildCaseSection(c) +
+    buildConclusionSection(c) +
+    buildNarrativeSection(narrativeData) +
     buildSuspectsSection(suspects) +
     buildEvidenceSection(evidence) +
     buildHistorySection(history);
@@ -560,6 +567,37 @@ function buildCaseSection(c) {
         <div class="rpt-field-value">${fv(c.description)}</div>
       </div>
     </div>
+  </div>`;
+}
+
+/* ── Section: Conclusion ── */
+function buildConclusionSection(c) {
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">✅ Conclusion</div>
+    <div style="background:rgba(17,22,41,.8); padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:10px; font-size:13px; color:#e2e8f0; line-height:1.6; white-space:pre-wrap;">${c.conclusion ? esc(c.conclusion) : '<span style="color:#68748b; font-style:italic;">No conclusion recorded.</span>'}</div>
+  </div>`;
+}
+
+/* ── Section: Investigation Narrative ── */
+function buildNarrativeSection(narrativeData) {
+  if (!narrativeData || !narrativeData.narrative) {
+    return `
+    <div class="rpt-section">
+      <div class="rpt-section-title">📝 Investigation Narrative</div>
+      <div style="background:rgba(17,22,41,.8); padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:10px; font-size:13px; color:#f87171; line-height:1.6; font-style:italic;">Failed to load narrative from backend.</div>
+    </div>`;
+  }
+  
+  const sourceLabel = narrativeData.source === 'ai' 
+    ? '<span style="background:rgba(59,130,246,.15); color:#60a5fa; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600; margin-left:10px; vertical-align:middle;">AI Generated</span>' 
+    : '<span style="background:rgba(148,163,184,.15); color:#94a3b8; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600; margin-left:10px; vertical-align:middle;">Rule-Based Fallback</span>';
+  
+  return `
+  <div class="rpt-section">
+    <div class="rpt-section-title">📝 Investigation Narrative ${sourceLabel}</div>
+    <div style="background:rgba(17,22,41,.8); padding:16px; border:1px solid rgba(255,255,255,.07); border-radius:10px; font-size:14px; color:#e2e8f0; line-height:1.7; white-space:pre-wrap;">${esc(narrativeData.narrative)}</div>
+    ${narrativeData.note ? `<div style="font-size:11px; color:#68748b; margin-top:8px; font-style:italic;">${esc(narrativeData.note)}</div>` : ''}
   </div>`;
 }
 
