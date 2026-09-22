@@ -444,106 +444,7 @@ body::before{
     <!-- CASES -->
 
     <div class="case-grid" id="caseGrid">
-
-        <div class="case-card" data-status="active">
-
-            <div class="case-top">
-                <span class="case-id">CASE C-001</span>
-                <span class="status active">Active</span>
-            </div>
-
-            <h2>College Laptop Theft</h2>
-
-            <div class="case-info">
-                Location: <span>Computer Lab</span><br>
-                Date: <span>08 September 2026</span><br>
-                Investigator: <span>Investigator</span>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="case-bottom">
-                <span class="evidence-count">🔬 3 Evidence Items</span>
-                <a href="#" class="view-btn">View Case →</a>
-            </div>
-
-        </div>
-
-
-        <div class="case-card" data-status="active">
-
-            <div class="case-top">
-                <span class="case-id">CASE C-002</span>
-                <span class="status active">Active</span>
-            </div>
-
-            <h2>Missing Device</h2>
-
-            <div class="case-info">
-                Location: <span>Library</span><br>
-                Date: <span>06 September 2026</span><br>
-                Investigator: <span>Investigator</span>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="case-bottom">
-                <span class="evidence-count">🔬 5 Evidence Items</span>
-                <a href="#" class="view-btn">View Case →</a>
-            </div>
-
-        </div>
-
-
-        <div class="case-card" data-status="examined">
-
-            <div class="case-top">
-                <span class="case-id">CASE C-003</span>
-                <span class="status examined">Examined</span>
-            </div>
-
-            <h2>Property Damage</h2>
-
-            <div class="case-info">
-                Location: <span>Block B</span><br>
-                Date: <span>02 September 2026</span><br>
-                Investigator: <span>Investigator</span>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="case-bottom">
-                <span class="evidence-count">🔬 4 Evidence Items</span>
-                <a href="#" class="view-btn">View Case →</a>
-            </div>
-
-        </div>
-
-
-        <div class="case-card" data-status="active">
-
-            <div class="case-top">
-                <span class="case-id">CASE C-004</span>
-                <span class="status active">Active</span>
-            </div>
-
-            <h2>Unauthorized Access</h2>
-
-            <div class="case-info">
-                Location: <span>Computer Center</span><br>
-                Date: <span>30 August 2026</span><br>
-                Investigator: <span>Investigator</span>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="case-bottom">
-                <span class="evidence-count">🔬 6 Evidence Items</span>
-                <a href="#" class="view-btn">View Case →</a>
-            </div>
-
-        </div>
-
+        <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #7f8aa3;">Loading cases...</div>
     </div>
 
 </main>
@@ -553,7 +454,7 @@ body::before{
 
 <script>
 
-const API = 'https://navigate-thesis-temporary-quantum.trycloudflare.com';
+const API = 'https://acts-allowance-sie-william.trycloudflare.com';
 const searchBox = document.getElementById("searchBox");
 const statusFilter = document.getElementById("statusFilter");
 const caseGrid = document.getElementById("caseGrid");
@@ -566,9 +467,11 @@ async function loadCases() {
             allCases = await response.json();
             renderCases();
         } else {
+            caseGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #f87171;">Unable to load cases. Please check the backend connection (HTTP ${response.status}).</div>`;
             console.error("Failed to fetch cases");
         }
     } catch (error) {
+        caseGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #f87171;">Unable to load cases. Please check the backend connection.</div>`;
         console.error("Error loading cases:", error);
     }
 }
@@ -620,6 +523,11 @@ function renderCases() {
         const matchesStatus = status === "all" || (c.status && c.status.toLowerCase() === status);
         return matchesSearch && matchesStatus;
     });
+
+    if (filteredCases.length === 0) {
+        caseGrid.innerHTML = `<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #7f8aa3;">No cases recorded.</div>`;
+        return;
+    }
 
     filteredCases.forEach(c => {
         const cardStatus = c.status ? c.status.toLowerCase() : "active";
