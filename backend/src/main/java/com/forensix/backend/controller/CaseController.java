@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cases")
@@ -36,6 +37,18 @@ public class CaseController {
     public ResponseEntity<InvestigationCase> updateCase(@PathVariable Long id, @RequestBody InvestigationCase updatedCase) {
         try {
             return ResponseEntity.ok(caseService.updateCase(id, updatedCase));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/conclusion")
+    public ResponseEntity<InvestigationCase> updateConclusion(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload) {
+        try {
+            String conclusion = payload.get("conclusion");
+            return ResponseEntity.ok(caseService.updateConclusion(id, conclusion));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

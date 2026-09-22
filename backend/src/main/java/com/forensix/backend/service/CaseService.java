@@ -39,6 +39,13 @@ public class CaseService {
         }).orElseThrow(() -> new RuntimeException("Case not found"));
     }
 
+    public InvestigationCase updateConclusion(Long id, String conclusion) {
+        return caseRepository.findById(id).map(c -> {
+            c.setConclusion(conclusion);
+            return caseRepository.save(c);
+        }).orElseThrow(() -> new RuntimeException("Case not found"));
+    }
+
     public void deleteCase(Long id) {
         caseRepository.deleteById(id);
     }

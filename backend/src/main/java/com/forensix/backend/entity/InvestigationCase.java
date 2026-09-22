@@ -25,6 +25,9 @@ public class InvestigationCase {
     @Column(length = 2000)
     private String description;
 
+    @Column(length = 3000)
+    private String conclusion;
+
     public InvestigationCase() {}
 
     public Long getId() { return id; }
@@ -43,4 +46,6 @@ public class InvestigationCase {
     public void setInvestigator(String investigator) { this.investigator = investigator; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getConclusion() { return conclusion; }
+    public void setConclusion(String conclusion) { this.conclusion = conclusion; }
 }

@@ -4,6 +4,7 @@ import com.forensix.backend.entity.Evidence;
 import com.forensix.backend.entity.EvidenceHistory;
 import com.forensix.backend.repository.EvidenceRepository;
 import com.forensix.backend.repository.EvidenceHistoryRepository;
+import com.forensix.backend.service.EvidenceAttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ public class EvidenceService {
 
     @Autowired
     private EvidenceHistoryRepository evidenceHistoryRepository;
+
+    @Autowired
+    private EvidenceAttachmentService evidenceAttachmentService;
 
     public Evidence addEvidence(Evidence evidence) {
         if (evidenceRepository.existsByEvidenceId(evidence.getEvidenceId())) {
@@ -60,8 +64,9 @@ public class EvidenceService {
 
     public void deleteEvidence(Long id) {
         Evidence evidence = evidenceRepository.findById(id).orElseThrow(() -> new RuntimeException("Evidence not found"));
+        // Cascade-delete file attachments from disk + DB before removing the evidence record
+        evidenceAttachmentService.deleteAllForEvidence(evidence.getEvidenceId());
         evidenceRepository.deleteById(id);
-        
         recordHistory(evidence.getEvidenceId(), "Evidence Record Deleted", evidence.getHandler(), "Deleted");
     }
 
