@@ -166,8 +166,63 @@ tbody tr:hover{background:rgba(59,130,246,.05);}
   </div>
 </div>
 
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editEvidenceOverlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('editEvidenceOverlay').classList.remove('open')">×</button>
+    <h2>Edit Evidence</h2>
+    <form id="editEvidenceForm">
+      <input type="hidden" id="editEvidenceId">
+      <input type="hidden" id="editEvidenceEvidenceId">
+      <div class="detail-grid" style="grid-template-columns:1fr 1fr; row-gap:15px; margin-top:10px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;">Evidence ID</label>
+          <div id="editEvidenceEvidenceIdDisplay" style="padding:8px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:6px; margin-top:5px; color:#68748b; font-size:13px;"></div>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;">Type</label>
+          <input type="text" id="editEvidenceType" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;">Case</label>
+          <input type="text" id="editEvidenceCaseId" required style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;">Collected Date</label>
+          <input type="date" id="editEvidenceDate" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;">Handler</label>
+          <input type="text" id="editEvidenceHandler" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;">Status</label>
+          <select id="editEvidenceStatus" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+              <option value="Collected">Collected</option>
+              <option value="Under Examination">Under Examination</option>
+              <option value="Examined">Examined</option>
+              <option value="Stored">Stored</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;">Description</label>
+          <textarea id="editEvidenceDescription" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px; resize:vertical; min-height:60px;"></textarea>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;">Notes</label>
+          <textarea id="editEvidenceNotes" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px; resize:vertical; min-height:60px;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="btn-sm" style="background:transparent; border:1px solid #283147; color:#9aa6bf;" onclick="document.getElementById('editEvidenceOverlay').classList.remove('open')">Cancel</button>
+        <button type="submit" class="btn-sm btn-edit" id="editEvidenceSaveBtn">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-const API = 'https://hwy-rat-administrative-hours.trycloudflare.com';
+const API = 'https://ceo-achieving-general-sites.trycloudflare.com';
 let allEvidence = [];
 
 function statusClass(s){
@@ -311,19 +366,60 @@ async function deleteAttachment(evidenceId, attachmentId, filename) {
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 document.getElementById('modal').addEventListener('click',function(ev){if(ev.target===this)closeModal();});
 
-async function editEvidence(id){
+function openEditEvidenceModal(id){
   const e=allEvidence.find(x=>x.id===id);if(!e)return;
-  const status=await appPrompt('Update status:\nCollected / Under Examination / Examined / Stored',e.status, "Update Status");
-  if(status===null)return;
-  const trimmed=status.trim();
-  if(!['Collected','Under Examination','Examined','Stored'].includes(trimmed)){await appAlert('Invalid status.', 'Error');return;}
-  const handler=await appPrompt('Handler name',e.handler, "Update Handler");
-  if(handler===null)return;
-  try{
-    const r=await fetch(`${API}/api/evidence/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:trimmed,handler:handler.trim()||e.handler})});
-    if(r.ok){await loadEvidence();}else await appAlert('Failed to update.', 'Error');
-  }catch(err){console.error(err);}
+  document.getElementById('editEvidenceId').value = e.id;
+  document.getElementById('editEvidenceEvidenceId').value = e.evidenceId || '';
+  document.getElementById('editEvidenceEvidenceIdDisplay').textContent = e.evidenceId || '—';
+  document.getElementById('editEvidenceType').value = e.type || '';
+  document.getElementById('editEvidenceCaseId').value = e.caseId || '';
+  document.getElementById('editEvidenceDate').value = e.collectionDate || '';
+  document.getElementById('editEvidenceHandler').value = e.handler || '';
+  document.getElementById('editEvidenceStatus').value = e.status || 'Collected';
+  document.getElementById('editEvidenceDescription').value = e.description || '';
+  document.getElementById('editEvidenceNotes').value = e.notes || '';
+  document.getElementById('editEvidenceOverlay').classList.add('open');
 }
+
+async function editEvidence(id){
+    openEditEvidenceModal(id);
+}
+
+document.getElementById('editEvidenceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editEvidenceId').value;
+    const btn = document.getElementById('editEvidenceSaveBtn');
+    const updated = {
+        evidenceId: document.getElementById('editEvidenceEvidenceId').value,
+        type: document.getElementById('editEvidenceType').value,
+        caseId: document.getElementById('editEvidenceCaseId').value,
+        collectionDate: document.getElementById('editEvidenceDate').value,
+        handler: document.getElementById('editEvidenceHandler').value,
+        status: document.getElementById('editEvidenceStatus').value,
+        description: document.getElementById('editEvidenceDescription').value,
+        notes: document.getElementById('editEvidenceNotes').value
+    };
+    btn.textContent = 'Saving...';
+    try {
+        const r = await fetch(`${API}/api/evidence/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+        });
+        if(r.ok) {
+            document.getElementById('editEvidenceOverlay').classList.remove('open');
+            await appAlert('Evidence updated successfully!', 'Success');
+            await loadEvidence();
+        } else {
+            await appAlert(`Failed to update. (HTTP ${r.status})`, 'Error');
+        }
+    } catch(err) {
+        console.error(err);
+        await appAlert('Network error occurred.', 'Error');
+    } finally {
+        btn.textContent = 'Save Changes';
+    }
+});
 
 async function deleteEvidence(id){
   const e=allEvidence.find(x=>x.id===id);if(!e)return;

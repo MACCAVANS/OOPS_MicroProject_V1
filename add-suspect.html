@@ -441,23 +441,7 @@ select option{
                     >
 
                         <option value="">
-                            Select Case
-                        </option>
-
-                        <option value="C-001">
-                            C-001 · College Laptop Theft
-                        </option>
-
-                        <option value="C-002">
-                            C-002 · Missing Device
-                        </option>
-
-                        <option value="C-003">
-                            C-003 · Property Damage
-                        </option>
-
-                        <option value="C-004">
-                            C-004 · Unauthorized Access
+                            Loading cases...
                         </option>
 
                     </select>
@@ -580,7 +564,29 @@ select option{
 
 <script>
 
-const API = 'https://hwy-rat-administrative-hours.trycloudflare.com';
+const API = 'https://ceo-achieving-general-sites.trycloudflare.com';
+
+document.addEventListener("DOMContentLoaded", async function() {
+    const caseSelect = document.getElementById("associatedCase");
+    try {
+        const response = await fetch(`${API}/api/cases`);
+        if (response.ok) {
+            const cases = await response.json();
+            caseSelect.innerHTML = '<option value="">Select Case</option>';
+            cases.forEach(c => {
+                const option = document.createElement("option");
+                option.value = c.caseNumber;
+                option.textContent = `${c.caseNumber} · ${c.caseTitle}`;
+                caseSelect.appendChild(option);
+            });
+        } else {
+            caseSelect.innerHTML = '<option value="">Failed to load cases</option>';
+        }
+    } catch (error) {
+        console.error("Error fetching cases:", error);
+        caseSelect.innerHTML = '<option value="">Error loading cases</option>';
+    }
+});
 
 document
     .getElementById("suspectForm")

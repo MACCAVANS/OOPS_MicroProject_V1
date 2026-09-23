@@ -4,6 +4,7 @@ import com.forensix.backend.entity.Evidence;
 import com.forensix.backend.entity.EvidenceHistory;
 import com.forensix.backend.repository.EvidenceRepository;
 import com.forensix.backend.repository.EvidenceHistoryRepository;
+import com.forensix.backend.repository.EvidenceAttachmentRepository;
 import com.forensix.backend.service.EvidenceAttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class EvidenceService {
 
     @Autowired
     private EvidenceHistoryRepository evidenceHistoryRepository;
+
+    @Autowired
+    private EvidenceAttachmentRepository evidenceAttachmentRepository;
 
     @Autowired
     private EvidenceAttachmentService evidenceAttachmentService;
@@ -60,6 +64,43 @@ public class EvidenceService {
         recordHistory(updated.getEvidenceId(), action, updated.getHandler(), updated.getStatus());
         
         return updated;
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public Evidence updateEvidence(Long id, Evidence updatedEvidence) {
+        return evidenceRepository.findById(id).map(existing -> {
+            String oldEvidenceId = existing.getEvidenceId();
+            String newEvidenceId = updatedEvidence.getEvidenceId();
+
+            existing.setEvidenceId(newEvidenceId);
+            existing.setType(updatedEvidence.getType());
+            existing.setCaseId(updatedEvidence.getCaseId());
+            existing.setCollectionDate(updatedEvidence.getCollectionDate());
+            existing.setHandler(updatedEvidence.getHandler());
+            existing.setStatus(updatedEvidence.getStatus());
+            existing.setDescription(updatedEvidence.getDescription());
+            existing.setNotes(updatedEvidence.getNotes());
+
+            Evidence saved = evidenceRepository.save(existing);
+
+            if (oldEvidenceId != null && !oldEvidenceId.equals(newEvidenceId)) {
+                // Update History
+                List<EvidenceHistory> history = evidenceHistoryRepository.findByEvidenceIdOrderByTimestampDesc(oldEvidenceId);
+                for (EvidenceHistory h : history) {
+                    h.setEvidenceId(newEvidenceId);
+                    evidenceHistoryRepository.save(h);
+                }
+                // Update Attachments
+                List<com.forensix.backend.entity.EvidenceAttachment> attachments = evidenceAttachmentRepository.findByEvidenceId(oldEvidenceId);
+                for (com.forensix.backend.entity.EvidenceAttachment att : attachments) {
+                    att.setEvidenceId(newEvidenceId);
+                    evidenceAttachmentRepository.save(att);
+                }
+            }
+
+            recordHistory(newEvidenceId, "Evidence Updated", existing.getHandler(), existing.getStatus());
+            return saved;
+        }).orElseThrow(() -> new RuntimeException("Evidence not found"));
     }
 
     public void deleteEvidence(Long id) {

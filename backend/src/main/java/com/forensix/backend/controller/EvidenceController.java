@@ -38,6 +38,15 @@ public class EvidenceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Evidence> updateEvidence(@PathVariable Long id, @RequestBody Evidence updatedEvidence) {
+        try {
+            return ResponseEntity.ok(evidenceService.updateEvidence(id, updatedEvidence));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PutMapping("/{id}/status")
     public ResponseEntity<Evidence> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         try {

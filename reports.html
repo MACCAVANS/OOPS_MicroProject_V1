@@ -273,19 +273,19 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
   <div class="stats">
     <div class="stat-card">
       <div class="stat-top"><span class="stat-icon">📁</span></div>
-      <h2>24</h2><p>Total Cases</p>
+      <h2 id="statCases">—</h2><p>Total Cases</p>
     </div>
     <div class="stat-card">
       <div class="stat-top"><span class="stat-icon">🔬</span></div>
-      <h2>86</h2><p>Evidence Records</p>
+      <h2 id="statEvidence">—</h2><p>Evidence Records</p>
     </div>
     <div class="stat-card">
       <div class="stat-top"><span class="stat-icon">🎯</span></div>
-      <h2>18</h2><p>Potential Matches</p>
+      <h2 id="statMatches">—</h2><p>Potential Matches</p>
     </div>
     <div class="stat-card">
       <div class="stat-top"><span class="stat-icon">📊</span></div>
-      <h2>12</h2><p>Reports Generated</p>
+      <h2 id="statReports">—</h2><p>Reports Generated</p>
     </div>
   </div>
 
@@ -399,7 +399,7 @@ body::before{content:"";position:fixed;width:500px;height:500px;background:#3b82
 </div>
 
 <script>
-const API = 'https://hwy-rat-administrative-hours.trycloudflare.com';
+const API = 'https://ceo-achieving-general-sites.trycloudflare.com';
 
 /* ─────────────────────────────────────────────
    Populate case dropdown from /api/cases
@@ -733,10 +733,31 @@ function statusBadgeClass(status) {
   return 'rpt-b-default';
 }
 
+async function loadStats() {
+    try {
+        const [casesRes, evidenceRes, matchesRes] = await Promise.all([
+            fetch(`${API}/api/cases`),
+            fetch(`${API}/api/evidence`),
+            fetch(`${API}/api/matches`)
+        ]);
+        const cases = casesRes.ok ? await casesRes.json() : [];
+        const evidence = evidenceRes.ok ? await evidenceRes.json() : [];
+        const matches = matchesRes.ok ? await matchesRes.json() : [];
+
+        document.getElementById('statCases').textContent = cases.length;
+        document.getElementById('statEvidence').textContent = evidence.length;
+        document.getElementById('statMatches').textContent = matches.length || 0;
+        document.getElementById('statReports').textContent = cases.length; // Approximate
+    } catch(err) {
+        console.error('Error loading stats', err);
+    }
+}
+
 /* ─────────────────────────────────────────────
    Initialise
 ───────────────────────────────────────────── */
 loadCaseDropdown();
+loadStats();
 </script>
 </body>
 </html>

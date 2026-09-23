@@ -172,6 +172,7 @@ body::before{
     padding:13px 16px;
     color:white;
     outline:none;
+    font-size:14px;
 }
 
 .search:focus{
@@ -185,6 +186,8 @@ body::before{
     padding:13px 18px;
     color:#aeb7ca;
     outline:none;
+    font-size:14px;
+    cursor:pointer;
 }
 
 /* CASE CARDS */
@@ -498,8 +501,6 @@ body::before{
             <span>Reports</span>
         </a>
 
-
-
     </nav>
 
     <div class="logout">
@@ -576,10 +577,46 @@ body::before{
   </div>
 </div>
 
+<!-- EDIT CASE MODAL -->
+<div class="dossier-overlay" id="editCaseOverlay">
+  <div class="dossier-box" style="max-width: 600px;">
+    <div class="dossier-header">
+      <button class="dossier-close" onclick="document.getElementById('editCaseOverlay').classList.remove('open')">×</button>
+      <h2>Edit Case</h2>
+    </div>
+    <div class="dossier-body">
+      <form id="editCaseForm">
+        <input type="hidden" id="editCaseId">
+        <input type="hidden" id="editCaseNumber">
+        <div class="d-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div class="d-field"><label>Case Number</label><div style="padding:8px; background:rgba(255,255,255,0.04); border:1px solid #202b40; border-radius:5px; color:#7f8aa3; font-size:13px;" id="editCaseNumberDisplay"></div></div>
+          <div class="d-field"><label>Status</label>
+            <select id="editCaseStatus" style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px;">
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Closed">Closed</option>
+              <option value="Cold Case">Cold Case</option>
+              <option value="Archived">Archived</option>
+            </select>
+          </div>
+          <div class="d-field full" style="grid-column: 1/-1;"><label>Case Title *</label><input type="text" id="editCaseTitle" required style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px;"></div>
+          <div class="d-field"><label>Location</label><input type="text" id="editCaseLocation" style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px;"></div>
+          <div class="d-field"><label>Incident Date</label><input type="date" id="editCaseDate" style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px;"></div>
+          <div class="d-field"><label>Investigator</label><input type="text" id="editCaseInvestigator" style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px;"></div>
+          <div class="d-field full" style="grid-column: 1/-1;"><label>Description</label><textarea id="editCaseDescription" style="width:100%; padding:8px; background:#0d1322; color:#edf1f8; border:1px solid #202b40; border-radius:5px; resize:vertical; min-height:80px;"></textarea></div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="d-save-btn" style="background:transparent; border:1px solid #283147; color:#9aa6bf;" onclick="document.getElementById('editCaseOverlay').classList.remove('open')">Cancel</button>
+          <button type="submit" class="d-save-btn" id="editCaseSaveBtn">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
 
-const API = 'https://hwy-rat-administrative-hours.trycloudflare.com';
+const API = 'https://ceo-achieving-general-sites.trycloudflare.com';
 const searchBox = document.getElementById("searchBox");
 const statusFilter = document.getElementById("statusFilter");
 const caseGrid = document.getElementById("caseGrid");
@@ -680,7 +717,10 @@ async function viewCase(caseId) {
 
     /* 1. Overview */
     html += `<div class="d-section">
-      <div class="d-section-title">Case Overview</div>
+      <div class="d-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Case Overview</span>
+          <button class="d-save-btn" onclick="openEditCaseModal(${c.id})" style="padding: 4px 10px; font-size: 11px; height:auto;">Edit Case</button>
+      </div>
       <div class="d-grid">
         <div class="d-field"><label>Case Number</label><span>${esc(c.caseNumber)}</span></div>
         <div class="d-field"><label>Status</label><span>${statusBadge(c.status)}</span></div>
@@ -911,6 +951,65 @@ function renderCases() {
 
 searchBox.addEventListener("input", renderCases);
 statusFilter.addEventListener("change", renderCases);
+
+function openEditCaseModal(id) {
+    const c = allCases.find(x => x.id === id);
+    if(!c) return;
+    document.getElementById('editCaseId').value = c.id;
+    document.getElementById('editCaseNumber').value = c.caseNumber || '';
+    document.getElementById('editCaseNumberDisplay').textContent = c.caseNumber || '—';
+    document.getElementById('editCaseTitle').value = c.caseTitle || '';
+    document.getElementById('editCaseStatus').value = c.status || 'Open';
+    document.getElementById('editCaseLocation').value = c.location || '';
+    document.getElementById('editCaseDate').value = c.incidentDate || '';
+    document.getElementById('editCaseInvestigator').value = c.investigator || '';
+    document.getElementById('editCaseDescription').value = c.description || '';
+    document.getElementById('editCaseOverlay').classList.add('open');
+}
+
+document.getElementById('editCaseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editCaseId').value;
+    const btn = document.getElementById('editCaseSaveBtn');
+    
+    const updatedCase = {
+        caseNumber: document.getElementById('editCaseNumber').value,
+        caseTitle: document.getElementById('editCaseTitle').value,
+        status: document.getElementById('editCaseStatus').value,
+        location: document.getElementById('editCaseLocation').value,
+        incidentDate: document.getElementById('editCaseDate').value,
+        investigator: document.getElementById('editCaseInvestigator').value,
+        description: document.getElementById('editCaseDescription').value
+    };
+
+    btn.textContent = 'Saving...';
+    try {
+        const res = await fetch(`${API}/api/cases/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedCase)
+        });
+        if(res.ok) {
+            const saved = await res.json();
+            const idx = allCases.findIndex(x => x.id == id);
+            if(idx !== -1) {
+                allCases[idx] = saved;
+            }
+            document.getElementById('editCaseOverlay').classList.remove('open');
+            renderCases();
+            // Wait a tick then reopen dossier with fresh data
+            setTimeout(() => viewCase(saved.id), 100);
+        } else {
+            const errStr = await res.text();
+            await appAlert(`Failed to update case. (HTTP ${res.status})`, 'Error');
+        }
+    } catch(err) {
+        console.error("Error updating case:", err);
+        await appAlert('Network error occurred while updating case.', 'Error');
+    } finally {
+        btn.textContent = 'Save Changes';
+    }
+});
 
 // Load cases on startup
 loadCases();
