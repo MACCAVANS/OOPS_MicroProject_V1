@@ -33,10 +33,11 @@ public class EvidenceService {
             throw new RuntimeException("Evidence ID already exists");
         }
         Evidence savedEvidence = evidenceRepository.save(evidence);
-        
+
         // Record history
-        recordHistory(savedEvidence.getEvidenceId(), "Evidence Collected", savedEvidence.getHandler(), savedEvidence.getStatus());
-        
+        recordHistory(savedEvidence.getEvidenceId(), "Evidence Collected", savedEvidence.getHandler(),
+                savedEvidence.getStatus());
+
         return savedEvidence;
     }
 
@@ -49,20 +50,24 @@ public class EvidenceService {
     }
 
     public Evidence updateEvidenceStatus(Long id, String status, String handler) {
-        Evidence evidence = evidenceRepository.findById(id).orElseThrow(() -> new RuntimeException("Evidence not found"));
+        Evidence evidence = evidenceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evidence not found"));
         evidence.setStatus(status);
         if (handler != null && !handler.isEmpty()) {
             evidence.setHandler(handler);
         }
         Evidence updated = evidenceRepository.save(evidence);
-        
+
         String action = "Status Updated";
-        if ("Under Examination".equals(status)) action = "Examination Started";
-        else if ("Examined".equals(status)) action = "Examination Completed";
-        else if ("Stored".equals(status)) action = "Evidence Stored";
+        if ("Under Examination".equals(status))
+            action = "Examination Started";
+        else if ("Examined".equals(status))
+            action = "Examination Completed";
+        else if ("Stored".equals(status))
+            action = "Evidence Stored";
 
         recordHistory(updated.getEvidenceId(), action, updated.getHandler(), updated.getStatus());
-        
+
         return updated;
     }
 
@@ -85,13 +90,15 @@ public class EvidenceService {
 
             if (oldEvidenceId != null && !oldEvidenceId.equals(newEvidenceId)) {
                 // Update History
-                List<EvidenceHistory> history = evidenceHistoryRepository.findByEvidenceIdOrderByTimestampDesc(oldEvidenceId);
+                List<EvidenceHistory> history = evidenceHistoryRepository
+                        .findByEvidenceIdOrderByTimestampDesc(oldEvidenceId);
                 for (EvidenceHistory h : history) {
                     h.setEvidenceId(newEvidenceId);
                     evidenceHistoryRepository.save(h);
                 }
                 // Update Attachments
-                List<com.forensix.backend.entity.EvidenceAttachment> attachments = evidenceAttachmentRepository.findByEvidenceId(oldEvidenceId);
+                List<com.forensix.backend.entity.EvidenceAttachment> attachments = evidenceAttachmentRepository
+                        .findByEvidenceId(oldEvidenceId);
                 for (com.forensix.backend.entity.EvidenceAttachment att : attachments) {
                     att.setEvidenceId(newEvidenceId);
                     evidenceAttachmentRepository.save(att);
@@ -104,8 +111,10 @@ public class EvidenceService {
     }
 
     public void deleteEvidence(Long id) {
-        Evidence evidence = evidenceRepository.findById(id).orElseThrow(() -> new RuntimeException("Evidence not found"));
-        // Cascade-delete file attachments from disk + DB before removing the evidence record
+        Evidence evidence = evidenceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evidence not found"));
+        // Cascade-delete file attachments from disk + DB before removing the evidence
+        // record
         evidenceAttachmentService.deleteAllForEvidence(evidence.getEvidenceId());
         evidenceRepository.deleteById(id);
         recordHistory(evidence.getEvidenceId(), "Evidence Record Deleted", evidence.getHandler(), "Deleted");
