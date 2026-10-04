@@ -186,11 +186,29 @@ function populateCases(){
 }
 
 document.getElementById('caseSelect').addEventListener('change',function(){
-  const caseNum=this.value;
+  const caseNum=this.value.trim();
   const esel=document.getElementById('evidenceSelect');
-  const filtered=caseNum?allEvidence.filter(e=>e.caseId===caseNum):allEvidence;
+
+  if(!caseNum){
+    esel.innerHTML='<option value="">Select a case first</option>';
+    esel.disabled=true;
+    return;
+  }
+
+  const filtered=allEvidence.filter(e =>
+    String(e.caseId ?? '').trim() === caseNum
+  );
+
+  if(filtered.length === 0){
+    esel.innerHTML='<option value="">No evidence for this case</option>';
+    esel.disabled=true;
+    return;
+  }
+
   esel.innerHTML='<option value="">Select evidence</option>'+
     filtered.map(e=>`<option value="${esc(e.evidenceId)}">${esc(e.evidenceId)} — ${esc(e.type)}</option>`).join('');
+
+  esel.disabled=false;
 });
 
 async function runMatching(){
