@@ -260,6 +260,21 @@ body{
     font-size:12px;
 }
 
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#0d1220;border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:28px;width:100%;max-width:560px; max-height:90vh; overflow-y:auto;}
+.modal-box h2{font-size:20px;margin-bottom:20px;}
+.detail-grid{display:grid;grid-template-columns:140px 1fr;gap:10px;font-size:13px;}
+.detail-grid b{color:#68748b;}
+.modal-close{float:right;background:none;border:none;color:#aeb7ca;font-size:24px;cursor:pointer;line-height:1;}
+.modal-close:hover{color:white;}
+
+/* ACTION BUTTONS */
+.btn-sm{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:.2s; text-decoration:none; display:inline-block;}
+.btn-edit{background:rgba(251,191,36,.10);color:#fbbf24;border:1px solid rgba(251,191,36,.22);}
+.btn-edit:hover{background:rgba(251,191,36,.20);}
+
 /* MOBILE */
 
 @media(max-width:1000px){
@@ -586,6 +601,60 @@ body{
 </div>
 
 
+<!-- VIEW MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Suspect Profile</h2>
+    <div class="detail-grid" id="modalContent"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editSuspectOverlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('editSuspectOverlay').classList.remove('open')">×</button>
+    <h2>Edit Suspect</h2>
+    <form id="editSuspectForm">
+      <input type="hidden" id="editSuspectId">
+      <div class="detail-grid" style="grid-template-columns:1fr 1fr; row-gap:15px; margin-top:10px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Suspect ID</label>
+          <input type="text" id="editSuspectSuspectId" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;" required>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Full Name</label>
+          <input type="text" id="editSuspectName" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;" required>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Associated Case</label>
+          <input type="text" id="editSuspectCase" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;" required>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Location</label>
+          <input type="text" id="editSuspectLocation" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Status</label>
+          <input type="text" id="editSuspectStatus" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Contact Info</label>
+          <input type="text" id="editSuspectContact" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:#68748b;display:block;margin-bottom:5px;">Notes</label>
+          <textarea id="editSuspectNotes" style="width:100%; padding:8px; background:#111629; color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; margin-top:5px; resize:vertical; min-height:60px;"></textarea>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="btn-sm" style="background:transparent; border:1px solid #283147; color:#9aa6bf; padding:6px 12px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('editSuspectOverlay').classList.remove('open')">Cancel</button>
+        <button type="submit" class="btn-sm btn-edit" id="editSuspectSaveBtn" style="background:rgba(251,191,36,.10); color:#fbbf24; border:1px solid rgba(251,191,36,.22); padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:600;">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
 
 const API = 'https://tunes-dodge-devices-handy.trycloudflare.com';
@@ -625,21 +694,77 @@ async function deleteSuspect(id) {
     }
 }
 
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
 async function viewSuspect(id) {
     const s = allSuspects.find(x => x.id === id);
     if (!s) return;
-    const msg = `
-        ID: ${s.suspectId}
-        Name: ${s.fullName}
-        Case: ${s.associatedCase}
-        Location: ${s.location || "N/A"}
-        Status: ${s.status || "N/A"}
-        
-        Contact: ${s.contactInfo || "N/A"}
-        Notes: ${s.notes || "No notes"}
+    document.getElementById('modalContent').innerHTML = `
+        <b>Suspect ID</b><span>${esc(s.suspectId)}</span>
+        <b>Full Name</b><span>${esc(s.fullName)}</span>
+        <b>Case</b><span>${esc(s.associatedCase)}</span>
+        <b>Location</b><span>${esc(s.location || "N/A")}</span>
+        <b>Status</b><span>${esc(s.status || "N/A")}</span>
+        <b>Contact Info</b><span>${esc(s.contactInfo || "N/A")}</span>
+        <b>Notes</b><span>${esc(s.notes || "No notes")}</span>
     `;
-    await appAlert(msg, "Suspect Profile");
+    document.getElementById('modal').classList.add('open');
 }
+
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',function(ev){if(ev.target===this)closeModal();});
+
+function openEditSuspectModal(id){
+  const s=allSuspects.find(x=>x.id===id);if(!s)return;
+  document.getElementById('editSuspectId').value = s.id;
+  document.getElementById('editSuspectSuspectId').value = s.suspectId || '';
+  document.getElementById('editSuspectName').value = s.fullName || '';
+  document.getElementById('editSuspectCase').value = s.associatedCase || '';
+  document.getElementById('editSuspectLocation').value = s.location || '';
+  document.getElementById('editSuspectStatus').value = s.status || '';
+  document.getElementById('editSuspectContact').value = s.contactInfo || '';
+  document.getElementById('editSuspectNotes').value = s.notes || '';
+  document.getElementById('editSuspectOverlay').classList.add('open');
+}
+
+async function editSuspect(id){
+    openEditSuspectModal(id);
+}
+
+document.getElementById('editSuspectForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editSuspectId').value;
+    const btn = document.getElementById('editSuspectSaveBtn');
+    const updated = {
+        suspectId: document.getElementById('editSuspectSuspectId').value,
+        fullName: document.getElementById('editSuspectName').value,
+        associatedCase: document.getElementById('editSuspectCase').value,
+        location: document.getElementById('editSuspectLocation').value,
+        status: document.getElementById('editSuspectStatus').value,
+        contactInfo: document.getElementById('editSuspectContact').value,
+        notes: document.getElementById('editSuspectNotes').value
+    };
+    btn.textContent = 'Saving...';
+    try {
+        const r = await fetch(`${API}/api/suspects/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+        });
+        if(r.ok) {
+            document.getElementById('editSuspectOverlay').classList.remove('open');
+            await appAlert('Suspect updated successfully!', 'Success');
+            await loadSuspects();
+        } else {
+            await appAlert(`Failed to update. (HTTP ${r.status})`, 'Error');
+        }
+    } catch(err) {
+        console.error(err);
+        await appAlert('Network error occurred.', 'Error');
+    } finally {
+        btn.textContent = 'Save Changes';
+    }
+});
 
 function renderSuspects() {
     const search = searchBox.value.toLowerCase();
@@ -685,7 +810,10 @@ function renderSuspects() {
 
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
                 <a href="#" onclick="deleteSuspect(${s.id}); return false;" style="color:#f87171; text-decoration:none; font-size:12px;">Delete</a>
-                <a href="#" onclick="viewSuspect(${s.id}); return false;" class="view-btn" style="margin-top:0;">View Profile →</a>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <a href="#" onclick="editSuspect(${s.id}); return false;" style="color:#fbbf24; text-decoration:none; font-size:12px;">Edit</a>
+                    <a href="#" onclick="viewSuspect(${s.id}); return false;" class="view-btn" style="margin-top:0;">View Profile →</a>
+                </div>
             </div>
         `;
         suspectGrid.appendChild(card);
